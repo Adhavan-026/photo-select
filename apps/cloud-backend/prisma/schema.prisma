@@ -1,0 +1,226 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  STUDIO_OWNER
+  EMPLOYEE
+  CLIENT
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+enum SyncState {
+  PENDING
+  SYNCED
+  FAILED
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  role          Role           @default(CLIENT)
+  isVerified    Boolean        @default(false)
+  otpHash       String?
+  otpExpiresAt  DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  // Relations
+  studioId      String?        // Null if Super Admin
+  studio        Studio?        @relation("StudioUsers", fields: [studioId], references: [id], onDelete: Cascade)
+  sessions      Session[]
+  auditLogs     AuditLog[]
+  clients       Client[]
+  employees     Employee[]
+}
+
+model Studio {
+  id           String             @id @default(uuid())
+  name         String
+  subdomain    String             @unique
+  logoUrl      String?
+  isActive     Boolean            @default(true)
+  storageUsage BigInt             @default(0) // in bytes
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  // Relations
+  users        User[]             @relation("StudioUsers")
+  subscription Subscription?
+  license      License?
+  employees    Employee[]
+  clients      Client[]
+  albums       Album[]
+  events       Event[]
+  settings     StudioSettings?
+}
+
+model StudioSettings {
+  id             String   @id @default(uuid())
+  studioId       String   @unique
+  studio         Studio   @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  watermarkText  String   @default("PhotoSelect")
+  watermarkAlpha Float    @default(0.3)
+  allowDownloads Boolean  @default(false)
+  theme          String   @default("dark")
+  updatedAt      DateTime @updatedAt
+}
+
+model Subscription {
+  id         String             @id @default(uuid())
+  studioId   String             @unique
+  studio     Studio             @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  planId     String             // Free, Pro, Enterprise
+  status     SubscriptionStatus @default(TRIALING)
+  priceId    String
+  startDate  DateTime           @default(now())
+  endDate    DateTime
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+}
+
+model License {
+  id         String    @id @default(uuid())
+  studioId   String    @unique
+  studio     Studio    @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  key        String    @unique
+  maxStorage BigInt    // Storage limit in bytes (e.g. 10TB)
+  isActive   Boolean   @default(true)
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model Employee {
+  id       String @id @default(uuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studioId String
+  studio   Studio @relation(fields: [studioId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id       String   @id @default(uuid())
+  userId   String   @unique
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studioId String
+  studio   Studio   @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  albums   Album[]  @relation("ClientAlbums")
+}
+
+model Album {
+  id            String      @id @default(uuid())
+  studioId      String
+  studio        Studio      @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  slug          String      @unique
+  isPrivate     Boolean     @default(true)
+  passcodeHash  String?
+  status        String      @default("PENDING")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  images        Image[]
+  clients       Client[]    @relation("ClientAlbums")
+  events        Event[]
+}
+
+model Image {
+  id             String    @id @default(uuid())
+  albumId        String
+  album          Album     @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  filename       String
+  localPath      String    // Path on photographer's computer
+  relativeStream String    // Encoded secure local path used for range streaming
+  hash           String    // MD5/SHA256 to prevent duplicates
+  width          Int
+  height         Int
+  fileSize       BigInt
+  exifData       Json?     // Camera, Lens, ISO, Focal Length, GPS
+  syncState      SyncState @default(PENDING)
+  createdAt      DateTime  @default(now())
+
+  // Selections / Favorites / Interactions
+  selections     Selection[]
+  comments       Comment[]
+}
+
+model Selection {
+  id         String   @id @default(uuid())
+  imageId    String
+  image      Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  clientId   String
+  isFavorite Boolean  @default(false)
+  isSelected Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([imageId, clientId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  imageId   String
+  image     Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  authorId  String   // User ID
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  studioId  String
+  studio    Studio   @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  albumId   String?
+  album     Album?    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  name      String
+  type      String   // E.g. SelectionCompleted, GalleryOpened
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  // Null if system event
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}

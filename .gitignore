@@ -1,0 +1,30 @@
+# Dependency directories
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build directories
+dist/
+.next/
+out/
+build/
+
+# Database files
+*.db
+*.db-journal
+postgres_data/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Agent specific caches
+apps/studio-agent/data/cache/
+apps/studio-agent/watched_photos/

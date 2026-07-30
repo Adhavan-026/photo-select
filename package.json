@@ -1,0 +1,16 @@
+{
+  "name": "photoselect-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace=apps/cloud-backend",
+    "dev:frontend": "npm run dev --workspace=apps/cloud-frontend",
+    "dev:agent": "npm run dev --workspace=apps/studio-agent"
+  },
+  "dependencies": {
+    "cors": "^2.8.6"
+  }
+}
