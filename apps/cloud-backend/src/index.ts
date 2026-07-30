@@ -14,6 +14,7 @@ import { clientRouter } from './presentation/routes/clientRoutes';
 import { studioRouter } from './presentation/routes/studioRoutes';
 
 const app = express();
+app.set('trust proxy', 1); // Trust Render reverse proxy for rate-limiting
 const server = http.createServer(app);
 
 // Configure WebSocket Server
