@@ -32,6 +32,7 @@ interface Album {
   slug: string;
   isPrivate: boolean;
   status?: 'PENDING' | 'SUBMITTED' | 'COMPLETED';
+  totalImages: number;
   createdAt: string;
   _count?: {
     images: number;
@@ -556,10 +557,30 @@ export default function StudioDashboard() {
                       {album.description || 'No description provided.'}
                     </p>
 
-                    <div className="flex items-center gap-1.5 mt-4 text-xs text-zinc-500">
-                      <ImageIcon className="h-3.5 w-3.5" />
-                      <span>{album._count?.images || 0} images synced</span>
-                    </div>
+                    {album.totalImages > 0 ? (
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-sans-custom">
+                          <span className="flex items-center gap-1">
+                            <RefreshCw className="h-3.5 w-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '3s' }} />
+                            Syncing: {album._count?.images || 0} / {album.totalImages}
+                          </span>
+                          <span className="font-semibold text-indigo-300">
+                            {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
+                          <div 
+                            className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
+                            style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 mt-4 text-xs text-zinc-500">
+                        <ImageIcon className="h-3.5 w-3.5" />
+                        <span>{album._count?.images || 0} images synced</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">

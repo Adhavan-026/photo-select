@@ -75,6 +75,14 @@ export class SyncClient {
       const db = await getDatabase();
       const folders = await db.all('SELECT COUNT(*) as count FROM watched_folders');
       const images = await db.all('SELECT COUNT(*) as count FROM local_images');
+      const progress = await db.all(`
+        SELECT 
+          album_id as albumId,
+          COUNT(*) as total,
+          SUM(CASE WHEN sync_status = 'SYNCED' THEN 1 ELSE 0 END) as synced
+        FROM local_images
+        GROUP BY album_id
+      `);
 
       const response = await axios.post(
         `${this.apiUrl}/sync/heartbeat`,
@@ -83,6 +91,7 @@ export class SyncClient {
           watchedFoldersCount: folders[0].count,
           localImagesCount: images[0].count,
           tunnelUrl: TunnelManager.getInstance().getTunnelUrl() || this.tunnelUrl,
+          progress,
         },
         this.getAuthHeaders()
       );

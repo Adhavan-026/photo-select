@@ -20,6 +20,13 @@ const heartbeatSchema = z.object({
   cpuUsage: z.number().optional(),
   memoryUsage: z.number().optional(),
   tunnelUrl: z.string().url('Invalid tunnel URL format'),
+  progress: z.array(
+    z.object({
+      albumId: z.string(),
+      total: z.number(),
+      synced: z.number(),
+    })
+  ).optional(),
 });
 
 const imageMetaSchema = z.object({
@@ -115,6 +122,16 @@ syncRouter.post(
           },
         },
       });
+
+      // Update totalImages on Album records based on heartbeat progress breakdown
+      if (validated.progress) {
+        for (const item of validated.progress) {
+          await prisma.album.updateMany({
+            where: { id: item.albumId, studioId },
+            data: { totalImages: item.total },
+          });
+        }
+      }
 
       // Fetch studio settings to return to the agent
       const settings = await prisma.studioSettings.findUnique({
