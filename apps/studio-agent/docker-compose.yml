@@ -11,6 +11,7 @@ services:
       - STUDIO_OWNER_EMAIL=${STUDIO_OWNER_EMAIL}
       - STUDIO_OWNER_PASSWORD=${STUDIO_OWNER_PASSWORD}
       - TUNNEL_URL=${TUNNEL_URL}
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
       - DB_DIR=/usr/src/app/data
       - PREVIEW_DIR=/usr/src/app/data/cache
     volumes:
@@ -42,11 +43,25 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: studio_agent_cloudflared
     restart: unless-stopped
+    profiles:
+      - cloudflare
     command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
     depends_on:
       - nginx
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: studio_agent_ngrok
+    restart: unless-stopped
+    profiles:
+      - ngrok
+    command: http nginx:80 --domain=${NGROK_DOMAIN}
+    depends_on:
+      - nginx
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
 
 volumes:
   agent-data:

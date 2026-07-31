@@ -20,9 +20,12 @@ export class TunnelManager {
     const token = process.env.TUNNEL_TOKEN;
     const hasToken = token && token !== 'your_cloudflare_tunnel_token_from_dashboard' && token.trim() !== '';
 
-    if (hasToken) {
-      console.log('🛡️ Cloudflare Tunnel Token detected. Relying on cloudflared container service.');
-      this.tunnelUrl = process.env.TUNNEL_URL || null;
+    const customUrl = process.env.TUNNEL_URL;
+    const hasCustomUrl = customUrl && customUrl !== 'https://studio-relay.trycloudflare.com' && customUrl.trim() !== '';
+
+    if (hasToken || hasCustomUrl) {
+      console.log(`🛡️ External Tunnel configured (${customUrl || 'using Token'}). Skipping internal Quick Tunnel.`);
+      this.tunnelUrl = customUrl || null;
       return;
     }
 
@@ -41,7 +44,7 @@ export class TunnelManager {
       const log = data.toString();
       // Search for: https://*.trycloudflare.com
       const match = log.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
-      if (match) {
+      if (match && match[0] !== 'https://studio-relay.trycloudflare.com') {
         this.tunnelUrl = match[0];
         console.log(`🚀 Live Quick Tunnel URL generated: ${this.tunnelUrl}`);
       }
