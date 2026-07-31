@@ -17,6 +17,19 @@ interface ProcessedResult {
   exifData: any;
 }
 
+function escapeXml(unsafe: string): string {
+  return unsafe.replace(/[<>&'"]/g, (c) => {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+}
+
 export class ImageProcessor {
   private outputDir: string;
 
@@ -106,6 +119,7 @@ export class ImageProcessor {
 
     // 6. Generate Watermarked WebP Preview (1920px width)
     // Burn text overlay dynamically into the output image buffer
+    const safeWatermarkText = escapeXml(watermarkText);
     const svgOverlay = `
       <svg width="${width > 1920 ? 1920 : width}" height="${height > 1080 ? 1080 : height}">
         <style>
@@ -118,7 +132,7 @@ export class ImageProcessor {
           }
         </style>
         <text x="50%" y="50%" class="watermark" transform="rotate(-30, 960, 540)">
-          ${watermarkText} - PREVIEW ONLY
+          ${safeWatermarkText} - PREVIEW ONLY
         </text>
       </svg>
     `;
