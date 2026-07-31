@@ -147,7 +147,7 @@ model Image {
   album          Album     @relation(fields: [albumId], references: [id], onDelete: Cascade)
   filename       String
   localPath      String    // Path on photographer's computer
-  relativeStream String    // Encoded secure local path used for range streaming
+  relativeStream String    @unique // Encoded secure local path used for range streaming
   hash           String    // MD5/SHA256 to prevent duplicates
   width          Int
   height         Int
