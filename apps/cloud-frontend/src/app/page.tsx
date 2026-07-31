@@ -1,5 +1,6 @@
 'use client';
 
+// Force new Vercel deployment of clean sunset design
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
