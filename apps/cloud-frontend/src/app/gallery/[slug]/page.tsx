@@ -84,6 +84,18 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
   const [submittingSelection, setSubmittingSelection] = useState(false);
   const [selectionSubmitted, setSelectionSubmitted] = useState(false);
 
+  // Responsive mobile screen state detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const handleSubmitSelection = async () => {
     const selectedCount = images.filter(img => img.selections?.some(s => s.clientId === clientId && s.isSelected)).length;
     if (selectedCount === 0) {
@@ -410,8 +422,9 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               const isFav = selection?.isFavorite || false;
               const isSel = selection?.isSelected || false;
 
-              // Render range stream endpoint or mock image if local agent isn't running
-              const imgSrc = `${streamBase}/file/${album.id}/${img.filename}?size=preview`;
+              // Render responsive size stream endpoint (thumbnail for mobile, preview for desktop)
+              const sizeParam = isMobile ? 'thumbnail' : 'preview';
+              const imgSrc = `${streamBase}/file/${album.id}/${img.filename}?size=${sizeParam}`;
 
               return (
                 <div 
@@ -481,7 +494,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
             </button>
 
             <img
-              src={`${streamBase}/file/${album.id}/${activeImage.filename}?size=watermark`}
+              src={`${streamBase}/file/${album.id}/${activeImage.filename}?size=${isMobile ? 'preview' : 'watermark'}`}
               alt={activeImage.filename}
               className="max-h-[85vh] max-w-[90%] object-contain rounded-lg"
               onError={(e) => {
