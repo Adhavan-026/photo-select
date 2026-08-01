@@ -188,6 +188,10 @@ albumRouter.get('/slug/:slug', async (req: Request, res: Response, next: NextFun
     const metadata = latestHeartbeat?.metadata as any;
     const tunnelUrl = metadata?.tunnelUrl || 'http://localhost:8082';
 
+    const isAgentOnline = latestHeartbeat 
+      ? (Date.now() - new Date(latestHeartbeat.createdAt).getTime()) < 3 * 60 * 1000
+      : false;
+
     res.status(200).json({
       success: true,
       album: {
@@ -195,6 +199,7 @@ albumRouter.get('/slug/:slug', async (req: Request, res: Response, next: NextFun
         images,
       },
       tunnelUrl,
+      isAgentOnline,
     });
   } catch (error) {
     next(error);

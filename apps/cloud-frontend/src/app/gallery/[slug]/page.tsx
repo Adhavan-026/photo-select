@@ -59,6 +59,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAgentOnline, setIsAgentOnline] = useState<boolean>(true);
 
   // Client Session Context
   const [clientId, setClientId] = useState<string>('');
@@ -140,6 +141,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
         const albumData = albumRes.data.album;
         setAlbum(albumData);
         setImages(albumData.images || []);
+        setIsAgentOnline(albumRes.data.isAgentOnline ?? true);
         
         // Setup stream URL based on Studio configuration
         let tunnelUrl = albumRes.data.tunnelUrl;
@@ -388,6 +390,15 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
 
       {/* Grid Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+        {!isAgentOnline && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6 flex items-center gap-3 animate-fade-in">
+            <Camera className="h-5 w-5 text-amber-400 animate-pulse shrink-0" />
+            <div className="text-xs text-amber-200">
+              <span className="font-bold">Photographer is offline.</span> The studio agent is currently disconnected. Photos and selection controls will load once the photographer starts the app online.
+            </div>
+          </div>
+        )}
+
         {images.length === 0 ? (
           <div className="text-center py-20 text-zinc-500">
             This album has no photos yet.
