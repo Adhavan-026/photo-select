@@ -197,10 +197,14 @@ app.post('/export-selected', async (req, res) => {
 
     let copiedCount = 0;
     for (const filename of filenames) {
-      const src = path.join(folder.path, filename);
-      const dest = path.join(exportPath, filename);
-      if (fs.existsSync(src)) {
-        fs.copyFileSync(src, dest);
+      const record = await db.get(
+        'SELECT local_path FROM local_images WHERE album_id = ? AND filename = ?',
+        [albumId, filename]
+      );
+      
+      if (record && record.local_path && fs.existsSync(record.local_path)) {
+        const dest = path.join(exportPath, filename);
+        fs.copyFileSync(record.local_path, dest);
         copiedCount++;
       }
     }
