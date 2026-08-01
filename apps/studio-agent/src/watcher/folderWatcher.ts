@@ -6,7 +6,7 @@ import { ImageProcessor } from '../processor/imageProcessor';
 
 export class FolderWatcher {
   private watchers: Map<string, chokidar.FSWatcher> = new Map();
-  private imageProcessor: ImageProcessor;
+  public imageProcessor: ImageProcessor;
   private onChangeCallback: (() => void) | null = null;
   private changeTimeout: NodeJS.Timeout | null = null;
 
