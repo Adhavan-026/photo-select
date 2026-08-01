@@ -234,6 +234,10 @@ async function bootstrap() {
   // Start folder watcher
   watcher = new FolderWatcher();
   await watcher.initialize();
+  watcher.onLocalChange(() => {
+    console.log('🔄 Local changes detected (add/remove). Triggering immediate heartbeat sync...');
+    syncClient?.sendHeartbeat();
+  });
 
   // Start cloud synchronization agent client
   syncClient = new SyncClient();

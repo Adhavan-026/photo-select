@@ -7,9 +7,24 @@ import { ImageProcessor } from '../processor/imageProcessor';
 export class FolderWatcher {
   private watchers: Map<string, chokidar.FSWatcher> = new Map();
   private imageProcessor: ImageProcessor;
+  private onChangeCallback: (() => void) | null = null;
+  private changeTimeout: NodeJS.Timeout | null = null;
 
   constructor() {
     this.imageProcessor = new ImageProcessor();
+  }
+
+  onLocalChange(callback: () => void) {
+    this.onChangeCallback = callback;
+  }
+
+  private triggerChange() {
+    if (this.changeTimeout) clearTimeout(this.changeTimeout);
+    this.changeTimeout = setTimeout(() => {
+      if (this.onChangeCallback) {
+        this.onChangeCallback();
+      }
+    }, 2000); // 2 seconds debounce
   }
 
   async initialize() {
@@ -71,6 +86,7 @@ export class FolderWatcher {
         );
 
         console.log(`✅ Processed and cached locally: ${path.basename(filePath)}`);
+        this.triggerChange();
       } catch (err) {
         console.error(`❌ Failed to process detected photo: ${filePath}`, err);
       }
@@ -91,7 +107,7 @@ export class FolderWatcher {
         });
 
         await db.run('DELETE FROM local_images WHERE local_path = ?', [filePath]);
-        // Note: in production we would send a sync notification to remove metadata from cloud
+        this.triggerChange();
       }
     });
 
