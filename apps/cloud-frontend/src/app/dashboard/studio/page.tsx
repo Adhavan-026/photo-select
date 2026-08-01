@@ -600,30 +600,57 @@ export default function StudioDashboard() {
                       {album.description || 'No description provided.'}
                     </p>
 
-                    {album.totalImages > 0 ? (
-                      <div className="mt-4">
-                        <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-sans-custom">
-                          <span className="flex items-center gap-1">
-                            <RefreshCw className="h-3.5 w-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '3s' }} />
-                            Syncing: {album._count?.images || 0} / {album.totalImages}
-                          </span>
-                          <span className="font-semibold text-indigo-300">
-                            {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
-                          </span>
+                    {/* Sync Status Section */}
+                    <div className="mt-4">
+                      {album.totalImages > 0 && (album._count?.images || 0) < album.totalImages ? (
+                        /* Actively Syncing state */
+                        <div>
+                          <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-sans-custom">
+                            <span className="flex items-center gap-1.5">
+                              <RefreshCw className="h-3.5 w-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '3s' }} />
+                              <span>Syncing: {album._count?.images || 0} / {album.totalImages}</span>
+                            </span>
+                            <span className="font-semibold text-indigo-300">
+                              {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
+                            <div 
+                              className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
+                              style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
-                          <div 
-                            className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
-                            style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
-                          />
+                      ) : (
+                        /* Idle / Completed state */
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+                            {album.totalImages > 0 && (album._count?.images || 0) >= album.totalImages ? (
+                              <>
+                                <Check className="h-3.5 w-3.5 text-emerald-400" />
+                                <span className="text-zinc-400">{album._count?.images || 0} images synced (Completed)</span>
+                              </>
+                            ) : (
+                              <>
+                                <ImageIcon className="h-3.5 w-3.5" />
+                                <span>{album._count?.images || 0} images synced</span>
+                              </>
+                            )}
+                          </div>
+                          
+                          {/* Manual refresh button for this album card */}
+                          <button
+                            onClick={() => loadDashboardData()}
+                            disabled={fetchingAlbums}
+                            className="p-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center gap-1 text-[10px] font-semibold"
+                            title="Check Sync Status"
+                          >
+                            <RefreshCw className={`h-3 w-3 ${fetchingAlbums ? 'animate-spin' : ''}`} />
+                            <span>Refresh</span>
+                          </button>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 mt-4 text-xs text-zinc-500">
-                        <ImageIcon className="h-3.5 w-3.5" />
-                        <span>{album._count?.images || 0} images synced</span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">
