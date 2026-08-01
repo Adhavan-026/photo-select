@@ -251,6 +251,14 @@ app.post('/albums/:albumId/scan', async (req, res) => {
     (async () => {
       try {
         console.log(`🔍 Manual scan requested for album: ${albumId} in ${folder.path}`);
+        
+        // Fetch current album status to preserve it (unlocked/locked state)
+        const albumDetails = await syncClient.getAlbum(albumId);
+        let originalStatus = albumDetails?.status || 'PENDING';
+        if (['SCANNING', 'PROCESSING', 'SYNCING'].includes(originalStatus)) {
+          originalStatus = 'PENDING';
+        }
+
         await syncClient.updateAlbumStatus(albumId, 'SCANNING');
 
         const watermarkConfig = await db.get('SELECT value FROM local_config WHERE key = ?', ['watermark_text']);
@@ -325,9 +333,9 @@ app.post('/albums/:albumId/scan', async (req, res) => {
         await syncClient.updateAlbumStatus(albumId, 'SYNCING');
         await syncClient.syncPendingMetadata();
 
-        // Finally set status to COMPLETED
-        await syncClient.updateAlbumStatus(albumId, 'COMPLETED');
-        console.log(`✅ Manual scan completed successfully for album: ${albumId}`);
+        // Finally restore the original status (e.g. PENDING or COMPLETED)
+        await syncClient.updateAlbumStatus(albumId, originalStatus);
+        console.log(`✅ Manual scan completed successfully for album: ${albumId}. Restored status to: ${originalStatus}`);
       } catch (scanErr: any) {
         console.error('❌ Manual scan execution failed:', scanErr.message);
       }

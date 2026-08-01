@@ -184,6 +184,23 @@ export class SyncClient {
     }
   }
 
+  async getAlbum(albumId: string) {
+    if (!this.token) {
+      const auth = await this.authenticate();
+      if (!auth) return null;
+    }
+    try {
+      const res = await axios.get(
+        `${this.apiUrl}/albums/${albumId}`,
+        this.getAuthHeaders()
+      );
+      return res.data?.album;
+    } catch (err: any) {
+      console.error(`⚠️ Failed to fetch album details:`, err.message);
+      return null;
+    }
+  }
+
   async updateAlbumStatus(albumId: string, status: string) {
     if (!this.token) {
       const auth = await this.authenticate();
