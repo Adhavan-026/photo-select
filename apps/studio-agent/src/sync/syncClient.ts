@@ -153,25 +153,34 @@ export class SyncClient {
           })),
         };
 
-        const res = await axios.post(
-          `${this.apiUrl}/sync/album/${albumId}/images`,
-          payload,
-          this.getAuthHeaders()
-        );
+        try {
+          const res = await axios.post(
+            `${this.apiUrl}/sync/album/${albumId}/images`,
+            payload,
+            this.getAuthHeaders()
+          );
 
-        if (res.data?.success) {
-          // Update status in local SQLite
-          const ids = albumImages.map((img: any) => `'${img.id}'`).join(',');
-          await db.run(`UPDATE local_images SET sync_status = 'SYNCED' WHERE id IN (${ids})`);
-          console.log(`✅ Synced metadata of ${albumImages.length} images for album: ${albumId}`);
+          if (res.data?.success) {
+            // Update status in local SQLite
+            const ids = albumImages.map((img: any) => `'${img.id}'`).join(',');
+            await db.run(`UPDATE local_images SET sync_status = 'SYNCED' WHERE id IN (${ids})`);
+            console.log(`✅ Synced metadata of ${albumImages.length} images for album: ${albumId}`);
+          }
+        } catch (err: any) {
+          if (err.response?.status === 401) {
+            this.token = null;
+          } else if (err.response?.status === 404) {
+            // If the album was deleted on the cloud, mark its local images as ORPHANED so they don't block the queue
+            console.warn(`⚠️ Album ${albumId} not found on cloud (404). Marking ${albumImages.length} local images as ORPHANED.`);
+            const ids = albumImages.map((img: any) => `'${img.id}'`).join(',');
+            await db.run(`UPDATE local_images SET sync_status = 'ORPHANED' WHERE id IN (${ids})`);
+          } else {
+            console.error(`❌ Sync failed for album ${albumId}:`, err.message);
+          }
         }
       }
     } catch (err: any) {
-      if (err.response?.status === 401) {
-        this.token = null;
-      } else {
-        console.error('❌ Sync failed:', err.message);
-      }
+      console.error('❌ Sync pending query failed:', err.message);
     }
   }
 
