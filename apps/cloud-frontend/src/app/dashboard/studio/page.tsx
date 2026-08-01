@@ -840,7 +840,7 @@ export default function StudioDashboard() {
                     const commentsCount = img.comments?.length || 0;
 
                     // Compute stream URL
-                    const localPreview = `http://localhost:8082/stream/file/${selectedAlbumDetails.id}/${img.filename}`;
+                    const localPreview = `http://localhost:8082/stream/file/${selectedAlbumDetails.id}/${img.filename}?size=thumbnail`;
 
                     return (
                       <div key={img.id} className="relative rounded-xl border border-white/5 bg-[#0d0d11] overflow-hidden p-2 flex flex-col justify-between space-y-2 group">

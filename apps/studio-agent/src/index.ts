@@ -24,18 +24,25 @@ app.get('/', (req, res) => {
 app.get('/stream/:imageId', async (req, res, next) => {
   try {
     const { imageId } = req.params;
+    const { size } = req.query;
     const db = await getDatabase();
     
     // Locate image cached details
     const image = await db.get('SELECT * FROM local_images WHERE id = ?', [imageId]);
     
-    if (!image || !image.watermark_preview_path) {
+    if (!image) {
       res.status(404).send('Image resource not found');
       return;
     }
 
-    const filePath = image.watermark_preview_path;
-    if (!fs.existsSync(filePath)) {
+    let filePath = image.watermark_preview_path;
+    if (size === 'thumbnail' && image.thumbnail_path) {
+      filePath = image.thumbnail_path;
+    } else if (size === 'preview' && image.preview_path) {
+      filePath = image.preview_path;
+    }
+
+    if (!filePath || !fs.existsSync(filePath)) {
       res.status(404).send('Physical image asset missing');
       return;
     }
@@ -85,6 +92,7 @@ app.get('/stream/:imageId', async (req, res, next) => {
 app.get('/stream/file/:albumId/:filename', async (req, res, next) => {
   try {
     const { albumId, filename } = req.params;
+    const { size } = req.query;
     const db = await getDatabase();
     
     // Locate image using albumId and filename
@@ -93,13 +101,19 @@ app.get('/stream/file/:albumId/:filename', async (req, res, next) => {
       [albumId, filename]
     );
     
-    if (!image || !image.watermark_preview_path) {
+    if (!image) {
       res.status(404).send('Image resource not found');
       return;
     }
 
-    const filePath = image.watermark_preview_path;
-    if (!fs.existsSync(filePath)) {
+    let filePath = image.watermark_preview_path;
+    if (size === 'thumbnail' && image.thumbnail_path) {
+      filePath = image.thumbnail_path;
+    } else if (size === 'preview' && image.preview_path) {
+      filePath = image.preview_path;
+    }
+
+    if (!filePath || !fs.existsSync(filePath)) {
       res.status(404).send('Physical image asset missing');
       return;
     }

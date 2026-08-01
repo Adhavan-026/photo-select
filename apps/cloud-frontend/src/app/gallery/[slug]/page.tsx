@@ -411,7 +411,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               const isSel = selection?.isSelected || false;
 
               // Render range stream endpoint or mock image if local agent isn't running
-              const imgSrc = `${streamBase}/file/${album.id}/${img.filename}`;
+              const imgSrc = `${streamBase}/file/${album.id}/${img.filename}?size=preview`;
 
               return (
                 <div 
@@ -481,7 +481,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
             </button>
 
             <img
-              src={`${streamBase}/file/${album.id}/${activeImage.filename}`}
+              src={`${streamBase}/file/${album.id}/${activeImage.filename}?size=watermark`}
               alt={activeImage.filename}
               className="max-h-[85vh] max-w-[90%] object-contain rounded-lg"
               onError={(e) => {
