@@ -145,6 +145,33 @@ albumRouter.put(
   }
 );
 
+// 4.5. Update Album Status only (Studio Owner / Employee / Agent)
+albumRouter.put(
+  '/:id/status',
+  authenticate,
+  requireRole([Role.STUDIO_OWNER, Role.EMPLOYEE]),
+  enforceTenant,
+  async (req: TenantedRequest, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      if (!status) {
+        throw new BadRequestError('status parameter is required');
+      }
+
+      const album = await albumRepository.findById(id);
+      if (!album || album.studioId !== req.tenantId) {
+        throw new NotFoundError('Album not found');
+      }
+
+      const updatedAlbum = await albumRepository.update(id, { status });
+      res.status(200).json({ success: true, status: updatedAlbum.status });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 // 5. Delete Album (Studio Owner)
 albumRouter.delete(
   '/:id',

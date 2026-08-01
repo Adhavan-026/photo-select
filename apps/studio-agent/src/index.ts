@@ -234,6 +234,109 @@ app.post('/export-selected', async (req, res) => {
   }
 });
 
+// Manual Scan and Upload Trigger Endpoint (interactive Scanning -> Processing -> Syncing -> Completed workflow)
+app.post('/albums/:albumId/scan', async (req, res) => {
+  const { albumId } = req.params;
+  try {
+    const db = await getDatabase();
+    const folder = await db.get('SELECT * FROM watched_folders WHERE album_id = ?', [albumId]);
+    if (!folder) {
+      res.status(404).json({ error: 'No watched folder configuration found for this album.' });
+      return;
+    }
+
+    res.status(200).json({ success: true, message: 'Scanning sequence started' });
+
+    // Run the scan asynchronously in the background so the HTTP response is sent immediately
+    (async () => {
+      try {
+        console.log(`🔍 Manual scan requested for album: ${albumId} in ${folder.path}`);
+        await syncClient.updateAlbumStatus(albumId, 'SCANNING');
+
+        const watermarkConfig = await db.get('SELECT value FROM local_config WHERE key = ?', ['watermark_text']);
+        const watermarkText = watermarkConfig?.value || 'PhotoSelect';
+
+        if (fs.existsSync(folder.path)) {
+          // Recursive helper to get all photos inside folder (supporting subfolders)
+          const getFiles = (dir: string): string[] => {
+            let results: string[] = [];
+            const list = fs.readdirSync(dir);
+            list.forEach((file) => {
+              const fullPath = path.join(dir, file);
+              const stat = fs.statSync(fullPath);
+              if (stat && stat.isDirectory()) {
+                results = results.concat(getFiles(fullPath));
+              } else {
+                const ext = path.extname(file).toLowerCase();
+                if (['.jpg', '.jpeg', '.png', '.webp', '.tiff'].includes(ext)) {
+                  results.push(fullPath);
+                }
+              }
+            });
+            return results;
+          };
+
+          const files = getFiles(folder.path);
+          console.log(`📂 Manual Scan: Detected ${files.length} photos in watched directory.`);
+
+          let hasNewFiles = false;
+
+          for (const filePath of files) {
+            // Check if file already exists in local SQLite
+            const existing = await db.get('SELECT id FROM local_images WHERE local_path = ?', [filePath]);
+            if (!existing) {
+              if (!hasNewFiles) {
+                hasNewFiles = true;
+                // Switch to PROCESSING status on cloud as soon as we start resizing/processing
+                await syncClient.updateAlbumStatus(albumId, 'PROCESSING');
+              }
+              
+              console.log(`📸 Manual Scan: Processing new photo: ${filePath}`);
+              try {
+                const result = await watcher.imageProcessor.processImage(filePath, watermarkText);
+                await db.run(
+                  `INSERT OR REPLACE INTO local_images 
+                   (id, album_id, filename, local_path, hash, sync_status, width, height, file_size, thumbnail_path, preview_path, watermark_preview_path, exif_data)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                  [
+                    result.id,
+                    albumId,
+                    path.basename(filePath),
+                    filePath,
+                    result.hash,
+                    'PENDING',
+                    result.width,
+                    result.height,
+                    result.fileSize,
+                    result.thumbnailPath,
+                    result.previewPath,
+                    result.watermarkPreviewPath,
+                    JSON.stringify(result.exifData),
+                  ]
+                );
+              } catch (procErr) {
+                console.error(`❌ Failed to process manual scan file: ${filePath}`, procErr);
+              }
+            }
+          }
+        }
+
+        // Set status to SYNCING and push metadata to cloud
+        await syncClient.updateAlbumStatus(albumId, 'SYNCING');
+        await syncClient.syncPendingMetadata();
+
+        // Finally set status to COMPLETED
+        await syncClient.updateAlbumStatus(albumId, 'COMPLETED');
+        console.log(`✅ Manual scan completed successfully for album: ${albumId}`);
+      } catch (scanErr: any) {
+        console.error('❌ Manual scan execution failed:', scanErr.message);
+      }
+    })();
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Boot dependencies
 let watcher: FolderWatcher;
 let syncClient: SyncClient;

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../lib/authContext';
 import { api } from '../../../lib/api';
+import axios from 'axios';
 
 interface Album {
   id: string;
@@ -31,7 +32,7 @@ interface Album {
   description: string | null;
   slug: string;
   isPrivate: boolean;
-  status?: 'PENDING' | 'SUBMITTED' | 'COMPLETED';
+  status?: 'PENDING' | 'SUBMITTED' | 'COMPLETED' | 'SCANNING' | 'PROCESSING' | 'SYNCING';
   totalImages: number;
   createdAt: string;
   _count?: {
@@ -328,6 +329,25 @@ export default function StudioDashboard() {
     }
   }, [user]);
 
+  const [refreshingAlbumId, setRefreshingAlbumId] = useState<string | null>(null);
+
+  const handleManualRefresh = async (albumId: string) => {
+    setRefreshingAlbumId(albumId);
+    try {
+      // Trigger scan on local agent directly
+      await axios.post(`http://localhost:8082/albums/${albumId}/scan`);
+    } catch (err) {
+      console.error('Local agent scan trigger failed', err);
+    }
+    
+    // Refresh dashboard values to update UI state
+    await loadDashboardData();
+    
+    setTimeout(() => {
+      setRefreshingAlbumId(null);
+    }, 2000);
+  };
+
   const handleCopyLink = (slug: string) => {
     const link = `${window.location.origin}/gallery/${slug}`;
     navigator.clipboard.writeText(link);
@@ -602,24 +622,32 @@ export default function StudioDashboard() {
 
                     {/* Sync Status Section */}
                     <div className="mt-4">
-                      {album.totalImages > 0 && (album._count?.images || 0) < album.totalImages ? (
-                        /* Actively Syncing state */
+                      {album.status === 'SCANNING' || album.status === 'PROCESSING' || album.status === 'SYNCING' || (album.totalImages > 0 && (album._count?.images || 0) < album.totalImages) ? (
+                        /* Actively Syncing / Processing / Scanning state */
                         <div>
                           <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-sans-custom">
                             <span className="flex items-center gap-1.5">
                               <RefreshCw className="h-3.5 w-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '3s' }} />
-                              <span>Syncing: {album._count?.images || 0} / {album.totalImages}</span>
+                              <span>
+                                {album.status === 'SCANNING' ? 'Scanning folder...' :
+                                 album.status === 'PROCESSING' ? 'Processing previews...' :
+                                 `Syncing: ${album._count?.images || 0} / ${album.totalImages}`}
+                              </span>
                             </span>
-                            <span className="font-semibold text-indigo-300">
-                              {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
-                            </span>
+                            {album.totalImages > 0 && (
+                              <span className="font-semibold text-indigo-300">
+                                {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
+                              </span>
+                            )}
                           </div>
-                          <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
-                            <div 
-                              className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
-                              style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
-                            />
-                          </div>
+                          {album.totalImages > 0 && (
+                            <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
+                              <div 
+                                className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
+                                style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
+                              />
+                            </div>
+                          )}
                         </div>
                       ) : (
                         /* Idle / Completed state */
@@ -640,12 +668,12 @@ export default function StudioDashboard() {
                           
                           {/* Manual refresh button for this album card */}
                           <button
-                            onClick={() => loadDashboardData()}
-                            disabled={fetchingAlbums}
+                            onClick={() => handleManualRefresh(album.id)}
+                            disabled={fetchingAlbums || refreshingAlbumId === album.id}
                             className="p-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center gap-1 text-[10px] font-semibold"
                             title="Check Sync Status"
                           >
-                            <RefreshCw className={`h-3 w-3 ${fetchingAlbums ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`h-3 w-3 ${fetchingAlbums || refreshingAlbumId === album.id ? 'animate-spin' : ''}`} />
                             <span>Refresh</span>
                           </button>
                         </div>

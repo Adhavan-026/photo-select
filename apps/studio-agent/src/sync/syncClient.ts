@@ -174,5 +174,22 @@ export class SyncClient {
       }
     }
   }
+
+  async updateAlbumStatus(albumId: string, status: string) {
+    if (!this.token) {
+      const auth = await this.authenticate();
+      if (!auth) return;
+    }
+    try {
+      await axios.put(
+        `${this.apiUrl}/albums/${albumId}/status`,
+        { status },
+        this.getAuthHeaders()
+      );
+      console.log(`📡 Album ${albumId} status updated to: ${status}`);
+    } catch (err: any) {
+      console.error(`⚠️ Failed to update album status on cloud:`, err.message);
+    }
+  }
 }
 export default SyncClient;
