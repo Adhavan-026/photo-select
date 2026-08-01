@@ -63,6 +63,7 @@ export default function StudioDashboard() {
   // Album Detail Selection states
   const [selectedAlbumDetails, setSelectedAlbumDetails] = useState<any>(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
+  const [viewFilter, setViewFilter] = useState<'all' | 'selected'>('selected');
 
   const handleViewAlbumDetails = async (albumId: string) => {
     setFetchingDetails(true);
@@ -831,11 +832,28 @@ export default function StudioDashboard() {
 
             <div className="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
               {/* Selected stats bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-indigo-500/5 border border-indigo-500/10 p-4 rounded-xl gap-4">
-                <div className="text-sm text-zinc-300">
-                  Total Selected: <span className="font-bold text-white">
-                    {selectedAlbumDetails.images?.filter((img: any) => img.selections?.some((s: any) => s.isSelected)).length || 0}
-                  </span> photos
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-indigo-500/5 border border-indigo-500/10 p-4 rounded-xl gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-zinc-300">
+                  <div>
+                    Total Selected: <span className="font-bold text-white">
+                      {selectedAlbumDetails.images?.filter((img: any) => img.selections?.some((s: any) => s.isSelected)).length || 0}
+                    </span> photos
+                  </div>
+                  {/* Filter toggle tabs */}
+                  <div className="flex bg-zinc-900/50 p-1 rounded-lg border border-white/5">
+                    <button
+                      onClick={() => setViewFilter('selected')}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'selected' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
+                    >
+                      Selected Only
+                    </button>
+                    <button
+                      onClick={() => setViewFilter('all')}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
+                    >
+                      All Images
+                    </button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
@@ -887,9 +905,20 @@ export default function StudioDashboard() {
                 <div className="text-center py-10 text-zinc-500">
                   No images synced in this album yet.
                 </div>
+              ) : selectedAlbumDetails.images?.filter((img: any) => viewFilter === 'all' || img.selections?.some((s: any) => s.isSelected)).length === 0 ? (
+                <div className="text-center py-10 text-zinc-500">
+                  No selected images found.
+                </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {selectedAlbumDetails.images?.map((img: any) => {
+                  {selectedAlbumDetails.images
+                    ?.filter((img: any) => {
+                      if (viewFilter === 'selected') {
+                        return img.selections?.some((s: any) => s.isSelected);
+                      }
+                      return true;
+                    })
+                    ?.map((img: any) => {
                     const isFav = img.selections?.some((s: any) => s.isFavorite);
                     const isSel = img.selections?.some((s: any) => s.isSelected);
                     const commentsCount = img.comments?.length || 0;
