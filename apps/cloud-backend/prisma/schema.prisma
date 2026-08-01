@@ -132,6 +132,7 @@ model Album {
   isPrivate     Boolean     @default(true)
   passcodeHash  String?
   status        String      @default("PENDING")
+  totalImages   Int         @default(0)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 

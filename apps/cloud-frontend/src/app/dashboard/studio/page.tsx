@@ -47,6 +47,7 @@ export default function StudioDashboard() {
   const [fetchingAlbums, setFetchingAlbums] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [completedToast, setCompletedToast] = useState<{ name: string; total: number } | null>(null);
 
   // Form states for new album
   const [albumName, setAlbumName] = useState('');
@@ -203,14 +204,37 @@ export default function StudioDashboard() {
     }
   }, [user, loading, router]);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (silent = false) => {
     if (!user) return;
-    setFetchingAlbums(true);
+    if (!silent) setFetchingAlbums(true);
     try {
       // 1. Fetch albums
       const albumRes = await api.get('/albums');
       if (albumRes.data?.success) {
-        setAlbums(albumRes.data.albums);
+        const newAlbums = albumRes.data.albums;
+
+        // Detect completed syncs for success toast pop-up
+        if (albums.length > 0) {
+          for (const newAlb of newAlbums) {
+            const oldAlb = albums.find(a => a.id === newAlb.id);
+            if (oldAlb) {
+              const oldSynced = oldAlb._count?.images || 0;
+              const oldTotal = oldAlb.totalImages;
+              const newSynced = newAlb._count?.images || 0;
+              const newTotal = newAlb.totalImages;
+
+              const wasSyncing = oldTotal > 0 && oldSynced < oldTotal;
+              const isFinished = newTotal > 0 && newSynced >= newTotal;
+
+              if (wasSyncing && isFinished) {
+                setCompletedToast({ name: newAlb.name, total: newTotal });
+                setTimeout(() => setCompletedToast(null), 5000);
+              }
+            }
+          }
+        }
+
+        setAlbums(newAlbums);
       }
 
       // 2. Fetch studio settings
@@ -282,6 +306,13 @@ export default function StudioDashboard() {
   useEffect(() => {
     if (user) {
       loadDashboardData();
+
+      // Poll silently in the background every 3 seconds
+      const interval = setInterval(() => {
+        loadDashboardData(true);
+      }, 3000);
+
+      return () => clearInterval(interval);
     }
   }, [user]);
 
@@ -848,6 +879,57 @@ export default function StudioDashboard() {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Syncing Progress Toast */}
+      {albums
+        .filter((album) => album.totalImages > 0 && (album._count?.images || 0) < album.totalImages)
+        .map((album) => {
+          const synced = album._count?.images || 0;
+          const total = album.totalImages;
+          const pct = Math.round((synced / total) * 100);
+
+          return (
+            <div key={album.id} className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#18041c]/95 border border-indigo-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
+                  <RefreshCw className="h-5 w-5 animate-spin" style={{ animationDuration: '3s' }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-white truncate">Syncing "{album.name}"</h4>
+                  <p className="text-xs text-zinc-400 mt-0.5">Uploading previews from your folder...</p>
+                  
+                  <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-2 font-mono">
+                    <span>{synced} / {total} photos</span>
+                    <span className="text-indigo-400 font-bold">{pct}%</span>
+                  </div>
+                  
+                  <div className="w-full bg-white/5 border border-white/5 rounded-full h-1 mt-1.5 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1 rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+      {/* Floating Completed Sync Success Toast */}
+      {completedToast && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#18041c]/95 border border-emerald-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+              <Check className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-bold text-white truncate">Sync Complete!</h4>
+              <p className="text-xs text-zinc-400 mt-0.5">"{completedToast.name}" is fully updated.</p>
+              <p className="text-[10px] text-emerald-400 font-bold mt-1">✓ {completedToast.total} photos uploaded successfully</p>
             </div>
           </div>
         </div>
