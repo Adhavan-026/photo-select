@@ -204,37 +204,14 @@ export default function StudioDashboard() {
     }
   }, [user, loading, router]);
 
-  const loadDashboardData = async (silent = false) => {
+  const loadDashboardData = async () => {
     if (!user) return;
-    if (!silent) setFetchingAlbums(true);
+    setFetchingAlbums(true);
     try {
       // 1. Fetch albums
       const albumRes = await api.get('/albums');
       if (albumRes.data?.success) {
-        const newAlbums = albumRes.data.albums;
-
-        // Detect completed syncs for success toast pop-up
-        if (albums.length > 0) {
-          for (const newAlb of newAlbums) {
-            const oldAlb = albums.find(a => a.id === newAlb.id);
-            if (oldAlb) {
-              const oldSynced = oldAlb._count?.images || 0;
-              const oldTotal = oldAlb.totalImages;
-              const newSynced = newAlb._count?.images || 0;
-              const newTotal = newAlb.totalImages;
-
-              const wasSyncing = oldTotal > 0 && oldSynced < oldTotal;
-              const isFinished = newTotal > 0 && newSynced >= newTotal;
-
-              if (wasSyncing && isFinished) {
-                setCompletedToast({ name: newAlb.name, total: newTotal });
-                setTimeout(() => setCompletedToast(null), 5000);
-              }
-            }
-          }
-        }
-
-        setAlbums(newAlbums);
+        setAlbums(albumRes.data.albums);
       }
 
       // 2. Fetch studio settings
@@ -303,14 +280,49 @@ export default function StudioDashboard() {
     }
   };
 
+  const pollSyncStatus = async () => {
+    try {
+      const albumRes = await api.get('/albums');
+      if (albumRes.data?.success) {
+        const newAlbums = albumRes.data.albums;
+
+        // Detect completed syncs for success toast pop-up
+        setAlbums((prevAlbums) => {
+          if (prevAlbums.length > 0) {
+            for (const newAlb of newAlbums) {
+              const oldAlb = prevAlbums.find((a) => a.id === newAlb.id);
+              if (oldAlb) {
+                const oldSynced = oldAlb._count?.images || 0;
+                const oldTotal = oldAlb.totalImages;
+                const newSynced = newAlb._count?.images || 0;
+                const newTotal = newAlb.totalImages;
+
+                const wasSyncing = oldTotal > 0 && oldSynced < oldTotal;
+                const isFinished = newTotal > 0 && newSynced >= newTotal;
+
+                if (wasSyncing && isFinished) {
+                  setCompletedToast({ name: newAlb.name, total: newTotal });
+                  setTimeout(() => setCompletedToast(null), 5000);
+                }
+              }
+            }
+          }
+          return newAlbums;
+        });
+      }
+    } catch (err) {
+      console.error('Silent sync poll failed', err);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       loadDashboardData();
 
-      // Poll silently in the background every 3 seconds
+      // Poll silently in the background every 5 seconds (keeps rate limit safe!)
       const interval = setInterval(() => {
-        loadDashboardData(true);
-      }, 3000);
+        pollSyncStatus();
+      }, 5000);
 
       return () => clearInterval(interval);
     }

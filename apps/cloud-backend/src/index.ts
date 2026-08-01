@@ -56,7 +56,7 @@ app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // Rate Limiter to prevent brute force / DDoS
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: env.NODE_ENV === 'production' ? 100 : 1000, // requests limit
+  max: env.NODE_ENV === 'production' ? 5000 : 10000, // requests limit
   standardHeaders: true,
   legacyHeaders: false,
   message: 'Too many requests from this IP, please try again after 15 minutes',
