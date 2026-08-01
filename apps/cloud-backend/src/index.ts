@@ -84,6 +84,38 @@ app.use(errorHandler);
 
 // Boot server
 const PORT = env.PORT;
-server.listen(PORT, () => {
+import { prisma } from './infrastructure/database/prisma';
+
+async function cleanDuplicateImages() {
+  try {
+    console.log('🧹 Running database cleanup for duplicate images...');
+    // Query duplicate rows
+    const duplicates = await prisma.$queryRaw<Array<{ albumId: string; filename: string; min_id: string }>>`
+      SELECT "albumId", "filename", MIN("id") as min_id
+      FROM "Image"
+      GROUP BY "albumId", "filename"
+      HAVING COUNT(*) > 1
+    `;
+
+    console.log(`🧹 Found ${duplicates.length} duplicate image groups.`);
+    for (const dup of duplicates) {
+      // Delete duplicates except the oldest one
+      const deleted = await prisma.image.deleteMany({
+        where: {
+          albumId: dup.albumId,
+          filename: dup.filename,
+          id: { not: dup.min_id }
+        }
+      });
+      console.log(`🧹 Deleted ${deleted.count} duplicate records for "${dup.filename}" in album ${dup.albumId}`);
+    }
+    console.log('🧹 Duplicate images cleanup finished successfully.');
+  } catch (err: any) {
+    console.error('⚠️ Database cleanup failed:', err.message);
+  }
+}
+
+server.listen(PORT, async () => {
   console.log(`🚀 PhotoSelect REST API Gateway running on port ${PORT} [${env.NODE_ENV}]`);
+  await cleanDuplicateImages();
 });

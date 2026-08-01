@@ -171,8 +171,18 @@ syncRouter.post(
 
       const validated = syncImagesSchema.parse(req.body);
 
+      // Query already synced image filenames in this album to skip duplicates
+      const existingImages = await prisma.image.findMany({
+        where: { albumId },
+        select: { filename: true }
+      });
+      const existingNames = new Set(existingImages.map((img) => img.filename));
+
+      // Filter out files that already exist with the same filename
+      const filteredImages = validated.images.filter((img) => !existingNames.has(img.filename));
+
       // Map to CreateImageDTO format
-      const formattedImages = validated.images.map((img) => ({
+      const formattedImages = filteredImages.map((img) => ({
         albumId,
         filename: img.filename,
         localPath: img.localPath,
@@ -184,18 +194,20 @@ syncRouter.post(
         exifData: img.exifData,
       }));
 
-      const syncCount = await imageRepository.createMany(formattedImages);
+      const syncCount = formattedImages.length > 0 ? await imageRepository.createMany(formattedImages) : 0;
 
-      // Accumulate storage metrics on the Studio level
-      const totalBytes = validated.images.reduce((acc, img) => acc + BigInt(img.fileSize.toString()), BigInt(0));
-      await prisma.studio.update({
-        where: { id: studioId },
-        data: {
-          storageUsage: {
-            increment: totalBytes,
+      // Accumulate storage metrics on the Studio level (only for newly synced images!)
+      if (formattedImages.length > 0) {
+        const totalBytes = formattedImages.reduce((acc, img) => acc + BigInt(img.fileSize.toString()), BigInt(0));
+        await prisma.studio.update({
+          where: { id: studioId },
+          data: {
+            storageUsage: {
+              increment: totalBytes,
+            },
           },
-        },
-      });
+        });
+      }
 
       res.status(200).json({
         success: true,
