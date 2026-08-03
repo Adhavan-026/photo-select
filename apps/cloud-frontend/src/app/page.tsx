@@ -99,23 +99,23 @@ export default function LandingPage() {
       `}</style>
 
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#18041c]/80 backdrop-blur-md">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center relative h-20 w-48">
+      <header className="absolute top-0 z-50 w-full pt-8">
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center relative h-16 w-48">
             <img src="/studioz-full-logo.png" alt="Studioz Logo" className="absolute top-1/2 left-0 -translate-y-1/2 h-[180px] w-auto max-w-none object-contain pointer-events-none" />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400 font-sans-custom">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-          </nav>
-
-          <div className="flex items-center gap-4 font-sans-custom">
-            <Link href="/login" className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors px-4 py-2">
-              Log in
-            </Link>
-            <Link href="/register" className="bg-[#e65c40] hover:bg-[#d14b30] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-[#e65c40]/20">
+          {/* Right Side Pill Container */}
+          <div className="hidden md:flex items-center bg-white rounded-full p-1.5 shadow-2xl">
+            <nav className="flex items-center gap-8 px-8 text-sm font-semibold text-zinc-600 font-sans-custom">
+              <a href="#features" className="hover:text-black transition-colors underline-offset-4 hover:underline">Features</a>
+              <a href="#architecture" className="hover:text-black transition-colors underline-offset-4 hover:underline">Architecture</a>
+              <a href="#pricing" className="hover:text-black transition-colors underline-offset-4 hover:underline">Pricing</a>
+              <Link href="/login" className="hover:text-black transition-colors">
+                Log in
+              </Link>
+            </nav>
+            <Link href="/register" className="text-sm font-bold bg-[#f97316] text-white px-8 py-3 rounded-full hover:bg-[#ea580c] transition-colors font-sans-custom shadow-md">
               Sign up
             </Link>
           </div>
