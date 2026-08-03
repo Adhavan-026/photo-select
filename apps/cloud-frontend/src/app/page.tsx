@@ -128,15 +128,15 @@ export default function LandingPage() {
         {/* Layer 0: Camera Lens Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           {/* Gradient overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0f141e]/80 via-[#0f141e]/40 to-[#0f141e] z-10"></div>
-          {/* Subtle 15% blur camera lens image */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f18]/90 via-[#0a0f18]/30 to-[#0a0f18] z-10"></div>
+          {/* Camera lens image with 15px blur */}
           <img 
             src="/camera-lens-bg.jpg" 
             alt="Camera Lens Background" 
-            className="absolute inset-0 w-[110%] h-[110%] left-[-5%] top-[-5%] object-cover opacity-20 blur-[15px] scale-105 z-0" 
+            className="absolute inset-0 w-[110%] h-[110%] left-[-5%] top-[-5%] object-cover opacity-90 blur-[15px] scale-105 z-0" 
           />
           {/* Color cast glow */}
-          <div className="absolute top-0 right-[-20%] w-[120%] h-[120%] rounded-full bg-blue-900/10 blur-[120px] pointer-events-none z-10"></div>
+          <div className="absolute top-0 right-[-20%] w-[120%] h-[120%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none z-10"></div>
         </div>
 
         {/* Layer 4: Sandwiched Content */}
