@@ -126,15 +126,17 @@ export default function LandingPage() {
       <section ref={heroRef} className="relative min-h-[92vh] flex flex-col items-center justify-center pt-24 pb-16 overflow-hidden z-20 bg-[#0f141e]">
         
         {/* Layer 0: Camera Lens Background */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          {/* Gradient overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f18]/90 via-[#0a0f18]/30 to-[#0a0f18] z-10"></div>
-          {/* Camera lens image with 15px blur */}
+        <div className="absolute inset-0 z-0 overflow-hidden bg-[#0a0f18]">
+          {/* Camera lens image with very subtle blur */}
           <img 
             src="/camera-lens-bg.jpg" 
             alt="Camera Lens Background" 
-            className="absolute inset-0 w-[110%] h-[110%] left-[-5%] top-[-5%] object-cover opacity-90 blur-[15px] scale-105 z-0" 
+            className="absolute inset-0 w-[105%] h-[105%] left-[-2.5%] top-[-2.5%] object-cover opacity-100 blur-[2px] z-0" 
           />
+          {/* Light gradient overlay just to ensure text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f18]/90 via-[#0a0f18]/40 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f18]/50 via-transparent to-[#0a0f18] z-10"></div>
+          
           {/* Color cast glow */}
           <div className="absolute top-0 right-[-20%] w-[120%] h-[120%] rounded-full bg-blue-500/10 blur-[120px] pointer-events-none z-10"></div>
         </div>
