@@ -101,8 +101,8 @@ export default function LandingPage() {
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#18041c]/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-12 w-auto object-contain" />
+          <Link href="/" className="flex items-center relative h-20 w-48">
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="absolute top-1/2 left-0 -translate-y-1/2 h-[180px] w-auto max-w-none object-contain pointer-events-none" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400 font-sans-custom">
