@@ -124,7 +124,7 @@ export class SyncClient {
     try {
       const db = await getDatabase();
       // Load pending images
-      const pendingImages = await db.all('SELECT * FROM local_images WHERE sync_status = ? LIMIT 100', ['PENDING']);
+      const pendingImages = await db.all('SELECT * FROM local_images WHERE sync_status = ? LIMIT 500', ['PENDING']);
 
       if (pendingImages.length === 0) return;
 
