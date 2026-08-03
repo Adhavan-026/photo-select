@@ -86,7 +86,7 @@ export default function LandingPage() {
   const opacityMockup = useTransform(mockupScroll, [0, 0.45], [0.1, 1]);
 
   return (
-    <div className="relative overflow-x-hidden font-sans bg-[#18041c] text-white">
+    <div className="relative overflow-x-hidden font-sans bg-[#0f172a] text-white">
       {/* Import Premium Google Fonts */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
@@ -128,32 +128,32 @@ export default function LandingPage() {
         {/* Layer 0: Sky (Background) */}
         <motion.div 
           style={{ y: ySky }} 
-          className="absolute inset-0 bg-gradient-to-b from-[#ffbe76] via-[#e65c40] to-[#8a313b] pointer-events-none z-0"
+          className="absolute inset-0 bg-gradient-to-b from-[#020617] via-[#0f172a] to-[#1e293b] pointer-events-none z-0"
         />
 
-        {/* Layer 1: Sunset Sun Glow */}
+        {/* Layer 1: Subtle Corporate Glow */}
         <motion.div 
           style={{ y: ySky }}
-          className="absolute top-[20%] left-1/2 transform -translate-x-1/2 w-[350px] h-[350px] rounded-full bg-[#ffe3a1]/30 blur-3xl pointer-events-none z-0"
+          className="absolute top-[20%] left-1/2 transform -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-3xl pointer-events-none z-0"
         />
 
         {/* Layer 2: Distant Ridge 1 (SVG) */}
         <motion.div 
           style={{ y: yMountainBack }}
-          className="absolute bottom-0 left-0 w-full h-[320px] pointer-events-none z-10 opacity-70"
+          className="absolute bottom-0 left-0 w-full h-[160px] pointer-events-none z-10 opacity-60"
         >
           <svg className="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="#8a313b" d="M0,180 C240,140 480,240 720,190 C960,140 1200,260 1440,210 L1440,320 L0,320 Z"></path>
+            <path fill="#334155" d="M0,180 C240,140 480,240 720,190 C960,140 1200,260 1440,210 L1440,320 L0,320 Z"></path>
           </svg>
         </motion.div>
 
         {/* Layer 3: Midground Ridge 2 (SVG) */}
         <motion.div 
           style={{ y: yMountainMid }}
-          className="absolute bottom-0 left-0 w-full h-[240px] pointer-events-none z-15"
+          className="absolute bottom-0 left-0 w-full h-[120px] pointer-events-none z-15"
         >
           <svg className="w-full h-full" viewBox="0 0 1440 240" preserveAspectRatio="none">
-            <path fill="#4f1a30" d="M0,120 C360,70 720,180 1080,110 C1260,75 1350,140 1440,130 L1440,240 L0,240 Z"></path>
+            <path fill="#1e293b" d="M0,120 C360,70 720,180 1080,110 C1260,75 1350,140 1440,130 L1440,240 L0,240 Z"></path>
           </svg>
         </motion.div>
 
@@ -166,9 +166,9 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#ffe3a1]/20 bg-[#ffe3a1]/5 text-xs font-semibold text-[#ffe3a1] mb-6 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-xs font-semibold text-blue-400 mb-6 backdrop-blur-sm font-sans-custom"
           >
-            <Zap className="h-3.5 w-3.5 text-[#ffb830]" />
+            <Zap className="h-3.5 w-3.5 text-blue-400" />
             <span>Hybrid Cloud Proofing Platform</span>
           </motion.div>
 
@@ -176,17 +176,17 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-7xl font-extrabold tracking-tight mb-5 max-w-4xl mx-auto leading-[1.08] font-title"
+            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl mx-auto leading-[1.08] font-sans-custom"
           >
             Local Photo Streaming. <br />
-            <span className="text-[#ffe3a1]">Zero Cloud Storage Cost.</span>
+            <span className="text-blue-400">Zero Cloud Storage Cost.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-sm md:text-lg text-zinc-200 mb-8 max-w-2xl mx-auto leading-relaxed font-sans-custom"
+            className="text-sm md:text-lg text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed font-sans-custom"
           >
             Never upload raw gigabytes online again. Stream beautiful watermarked proofing previews to clients straight from your local drive.
           </motion.p>
@@ -197,31 +197,31 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 font-sans-custom"
           >
-            <Link href="/register" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#e65c40] hover:bg-[#d14b30] text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-[#e65c40]/20 transition-all">
+            <Link href="/register" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold px-8 py-4 rounded-full shadow-xl shadow-[#f97316]/20 transition-all">
               <span>Start Free Trial</span>
               <ArrowRight className="h-4.5 w-4.5" />
             </Link>
-            <a href="#features" className="w-full sm:w-auto flex items-center justify-center gap-2 border border-white/20 bg-white/5 font-semibold px-8 py-4 rounded-xl hover:bg-white/10 transition-colors text-white backdrop-blur-sm">
+            <a href="#features" className="w-full sm:w-auto flex items-center justify-center gap-2 border border-white/10 bg-white/5 font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-colors text-zinc-300 backdrop-blur-sm">
               <span>Explore Features</span>
             </a>
           </motion.div>
         </motion.div>
 
-        {/* Layer 5: Foreground Ridge 3 (SVG - Solid dark plum) */}
+        {/* Layer 5: Foreground Ridge 3 (SVG - Solid dark) */}
         <motion.div 
           style={{ y: yMountainFront }}
-          className="absolute bottom-[-2px] left-0 w-full h-[150px] pointer-events-none z-30"
+          className="absolute bottom-[-2px] left-0 w-full h-[75px] pointer-events-none z-30"
         >
           <svg className="w-full h-full" viewBox="0 0 1440 150" preserveAspectRatio="none">
-            <path fill="#18041c" d="M0,80 C180,120 360,50 540,70 C720,90 900,40 1080,60 C1260,80 1350,40 1440,50 L1440,150 L0,150 Z"></path>
+            <path fill="#0f172a" d="M0,80 C180,120 360,50 540,70 C720,90 900,40 1080,60 C1260,80 1350,40 1440,50 L1440,150 L0,150 Z"></path>
           </svg>
         </motion.div>
       </section>
 
       {/* 3D Dashboard Showcase on Scroll */}
-      <section ref={mockupRef} className="container mx-auto px-6 py-24 z-30 relative bg-[#18041c] overflow-visible font-sans-custom">
+      <section ref={mockupRef} className="container mx-auto px-6 py-24 z-30 relative bg-[#0f172a] overflow-visible font-sans-custom">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 font-title tracking-tight">Your Entire Studio Workspace, Live</h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 font-sans-custom tracking-tight text-white">Your Entire Studio Workspace, Live</h2>
           <p className="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">Manage active portfolios, verify client selections, and inspect sync speed in a single screen.</p>
         </div>
 
@@ -249,11 +249,11 @@ export default function LandingPage() {
               <div>
                 <h4 className="text-[10px] uppercase tracking-wider text-[#ffb830] font-bold mb-3">Live Feed</h4>
                 <div className="flex flex-col gap-3">
-                  <div className="bg-[#18041c]/50 border border-white/5 rounded-lg p-2.5 text-[10px]">
+                  <div className="bg-[#0f172a]/50 border border-white/5 rounded-lg p-2.5 text-[10px]">
                     <p className="text-zinc-300 font-semibold mb-0.5">OTP Verified</p>
                     <p className="text-[9px] text-zinc-500">Malliga & Murugesan</p>
                   </div>
-                  <div className="bg-[#18041c]/50 border border-white/5 rounded-lg p-2.5 text-[10px]">
+                  <div className="bg-[#0f172a]/50 border border-white/5 rounded-lg p-2.5 text-[10px]">
                     <p className="text-zinc-300 font-semibold mb-0.5">Selection Saved</p>
                     <p className="text-[9px] text-zinc-500">Adhavan selection is complete</p>
                   </div>
@@ -275,7 +275,7 @@ export default function LandingPage() {
 
               {/* Album Cards Mock */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-[#18041c]/50 border border-white/5 rounded-xl p-5 relative">
+                <div className="bg-[#0f172a]/50 border border-white/5 rounded-xl p-5 relative">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] text-zinc-500 font-mono">Created 7/31/2026</span>
                     <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 rounded text-[9px] font-semibold">Active</span>
@@ -288,7 +288,7 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="bg-[#18041c]/50 border border-white/5 rounded-xl p-5 relative">
+                <div className="bg-[#0f172a]/50 border border-white/5 rounded-xl p-5 relative">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] text-zinc-500 font-mono">Created 7/30/2026</span>
                     <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 px-2 py-0.5 rounded text-[9px] font-semibold">Active</span>
@@ -307,7 +307,7 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive 3D Tilt Feature Grid */}
-      <section id="features" className="container mx-auto px-6 py-24 border-t border-white/5 bg-[#18041c] font-sans-custom">
+      <section id="features" className="container mx-auto px-6 py-24 border-t border-white/5 bg-[#0f172a] font-sans-custom">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-4 font-title tracking-tight">Engineered for Busy Studio Workflows</h2>
           <p className="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">We combine cloud coordination with a high-performance local daemon running on your computer.</p>
@@ -356,7 +356,7 @@ export default function LandingPage() {
       </section>
 
       {/* High-Performance Architecture Section */}
-      <section id="architecture" className="container mx-auto px-6 py-24 border-t border-white/5 bg-[#18041c] font-sans-custom">
+      <section id="architecture" className="container mx-auto px-6 py-24 border-t border-white/5 bg-[#0f172a] font-sans-custom">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 font-title tracking-tight text-[#ffe3a1]">The Hybrid Cloud Flow</h2>
@@ -398,20 +398,20 @@ export default function LandingPage() {
           <div className="glass-card p-6 rounded-2xl border border-white/5 bg-[#250a29]/40 relative overflow-hidden flex flex-col gap-4 shadow-xl">
             <h4 className="text-xs uppercase font-bold tracking-widest text-[#ffb830]">Local Agent Stats</h4>
             <div className="grid grid-cols-2 gap-4 mt-2">
-              <div className="bg-[#18041c]/50 border border-white/5 rounded-xl p-4">
+              <div className="bg-[#0f172a]/50 border border-white/5 rounded-xl p-4">
                 <p className="text-[10px] text-zinc-500 mb-1">Heartbeat Status</p>
                 <p className="text-sm font-bold text-emerald-400">ONLINE</p>
               </div>
-              <div className="bg-[#18041c]/50 border border-white/5 rounded-xl p-4">
+              <div className="bg-[#0f172a]/50 border border-white/5 rounded-xl p-4">
                 <p className="text-[10px] text-zinc-500 mb-1">Sync Cache</p>
                 <p className="text-sm font-bold text-white">114 Images</p>
               </div>
-              <div className="bg-[#18041c]/50 border border-white/5 rounded-xl p-4 col-span-2">
+              <div className="bg-[#0f172a]/50 border border-white/5 rounded-xl p-4 col-span-2">
                 <p className="text-[10px] text-zinc-500 mb-1">Tunnel Domain</p>
                 <p className="text-xs font-mono font-semibold text-[#ffb830]">purity-awkward-idealness.ngrok-free.dev</p>
               </div>
             </div>
-            <div className="bg-[#18041c]/50 border border-white/5 rounded-xl p-4">
+            <div className="bg-[#0f172a]/50 border border-white/5 rounded-xl p-4">
               <h5 className="text-[11px] font-bold text-white mb-2">Sync Speeds (JPEG to WebP conversion)</h5>
               <div className="w-full bg-zinc-800 rounded-full h-1.5 mb-2">
                 <div className="bg-[#e65c40] h-1.5 rounded-full" style={{ width: '85%' }}></div>
@@ -426,7 +426,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="container mx-auto px-6 py-24 border-t border-white/5 bg-[#18041c] font-sans-custom">
+      <section id="pricing" className="container mx-auto px-6 py-24 border-t border-white/5 bg-[#0f172a] font-sans-custom">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-4 font-title tracking-tight">Flexible Plans for Every Studio</h2>
           <p className="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">Get started for free or unlock unlimited galleries for busy wedding studios.</p>
@@ -482,7 +482,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-16 text-center text-sm text-zinc-500 bg-[#18041c]">
+      <footer className="border-t border-white/5 py-16 text-center text-sm text-zinc-500 bg-[#0f172a]">
         <div className="container mx-auto px-6">
           <p>© {new Date().getFullYear()} Studioz (powered by Clickone). All rights reserved.</p>
         </div>
