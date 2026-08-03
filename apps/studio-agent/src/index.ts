@@ -52,285 +52,176 @@ const PORT = process.env.AGENT_PORT || 8080;
 
 const dashboardHtml = `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Studioz Engine Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #09090b;
-      --card-bg: rgba(18, 18, 22, 0.7);
-      --border: rgba(255, 255, 255, 0.08);
-      --indigo: #6366f1;
-      --emerald: #10b981;
-      --zinc-400: #a1a1aa;
-      --zinc-550: #6a6a75;
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            slate: {
+              850: '#151e2c',
+              900: '#0f172a',
+              950: '#020617',
+            }
+          }
+        }
+      }
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      background-color: var(--bg);
-      color: #f4f4f5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-    header {
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(9, 9, 11, 0.7);
-    }
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 700;
-      font-size: 1.25rem;
-      color: #fff;
-    }
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-      color: var(--emerald);
-      padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--emerald);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--emerald);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 1; }
-      100% { opacity: 0.4; }
-    }
-    .container {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 1.5rem;
-      padding: 2rem;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      flex: 1;
-    }
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-    }
-    .col-3 { grid-column: span 3; }
-    .col-6 { grid-column: span 6; }
-    .col-12 { grid-column: span 12; }
-    @media (max-width: 1024px) {
-      .col-3 { grid-column: span 6; }
-    }
-    @media (max-width: 768px) {
-      .col-3, .col-6, .col-12 { grid-column: span 12; }
-    }
-    h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.5rem;
-    }
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .stat-val {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #fff;
-    }
-    .stat-label {
-      font-size: 0.875rem;
-      color: var(--zinc-400);
-    }
-    .console-panel {
-      font-family: 'Courier New', Courier, monospace;
-      background: #050507;
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      padding: 1rem;
-      height: 350px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-size: 0.8125rem;
-      color: #38bdf8;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
-    }
-    .table-container {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.875rem;
-    }
-    th {
-      padding: 0.75rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--zinc-550);
-      font-weight: 600;
-    }
-    td {
-      padding: 0.75rem;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-      color: var(--zinc-200);
-    }
-    .tunnel-url {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      padding: 0.75rem 1rem;
-      border-radius: 0.5rem;
-      font-family: monospace;
-      font-size: 0.875rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      word-break: break-all;
-    }
-    .btn {
-      background: var(--indigo);
-      border: none;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.8125rem;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .btn:hover { background: #4f46e5; }
-    .btn:active { transform: scale(0.98); }
-    .dashboard-footer {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--zinc-550);
-      font-size: 0.75rem;
-      border-top: 1px solid var(--border);
-    }
-  </style>
+  </script>
 </head>
-<body>
-  <header>
-    <div class="header-logo">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-      <span>Studioz Engine Panel</span>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen flex flex-col">
+  <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center gap-3">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      <span class="text-xl font-bold text-white tracking-tight">Studioz <span class="text-slate-400 font-normal">Engine</span></span>
     </div>
-    <div class="status-badge">
-      <div class="status-dot"></div>
-      <span id="engine-status">ONLINE</span>
+    <div class="flex items-center gap-4">
+      <div id="status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold transition-colors">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span>RUNNING</span>
+      </div>
     </div>
   </header>
 
-  <div class="container">
-    <div class="card col-3">
-      <h2>📁 Active Folders</h2>
-      <div class="stat-row">
-        <div class="stat-val" id="folders-count">0</div>
-        <div class="stat-label">Watched</div>
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+    
+    <!-- Control Panel -->
+    <div class="md:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold text-white mb-1">Engine Controls</h2>
+        <p class="text-sm text-slate-400">Manage the local background synchronization engine.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="btn-start" onclick="startEngine()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Start Engine
+        </button>
+        <button id="btn-stop" onclick="stopEngine()" class="px-6 py-2.5 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/50 text-slate-300 font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
+          Stop Engine
+        </button>
       </div>
     </div>
-    <div class="card col-3">
-      <h2>✅ Synced Photos</h2>
-      <div class="stat-row">
-        <div class="stat-val" id="synced-count" style="color: var(--emerald);">0</div>
-        <div class="stat-label">To Cloud</div>
-      </div>
+
+    <!-- Stats Cards -->
+    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-blue-400">📁</span> Watched Folders</h3>
+      <div class="text-3xl font-bold text-white" id="folders-count">0</div>
     </div>
-    <div class="card col-3">
-      <h2>⏳ Pending Sync</h2>
-      <div class="stat-row">
-        <div class="stat-val" id="pending-count" style="color: #f59e0b;">0</div>
-        <div class="stat-label">Queued</div>
-      </div>
+    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-emerald-400">✅</span> Synced Photos</h3>
+      <div class="text-3xl font-bold text-emerald-400" id="synced-count">0</div>
     </div>
-    <div class="card col-3">
-      <h2>⚙️ System Info</h2>
-      <div class="stat-row">
+    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-amber-400">⏳</span> Pending Sync</h3>
+      <div class="text-3xl font-bold text-amber-400" id="pending-count">0</div>
+    </div>
+    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-purple-400">⚙️</span> System</h3>
+      <div class="text-xl font-bold text-white mb-1" id="sys-uptime">0s</div>
+      <div class="text-xs text-slate-500" id="sys-mem">Memory: --</div>
+    </div>
+
+    <!-- Cloud Link -->
+    <div class="md:col-span-12 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="text-lg">🔗</span>
         <div>
-          <div style="font-size: 1rem; font-weight: 600;" id="sys-uptime">0s</div>
-          <div class="stat-label" id="sys-mem">Memory: --</div>
+          <div class="text-sm font-medium text-slate-300">Secure Cloud Tunnel</div>
+          <div class="font-mono text-xs text-blue-400 break-all" id="tunnel-url">Initializing...</div>
         </div>
       </div>
+      <button onclick="copyTunnel()" class="shrink-0 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition-colors border border-slate-700">Copy URL</button>
     </div>
 
-    <div class="card col-12">
-      <h2>🔗 Cloud Link Relay Tunnel</h2>
-      <div class="tunnel-url">
-        <span id="tunnel-url">Initializing secure link...</span>
-        <button class="btn" onclick="copyTunnel()">Copy URL</button>
+    <!-- Live Feed -->
+    <div class="md:col-span-12 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-[400px]">
+      <div class="px-5 py-3 border-b border-slate-800 bg-slate-850 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+        <span class="ml-2 text-xs font-medium text-slate-500 uppercase tracking-wider">Live Engine Console</span>
+      </div>
+      <div class="flex-1 p-5 overflow-y-auto font-mono text-xs text-slate-400 leading-relaxed bg-[#0a0f18]" id="console-logs">
+        System startup logged. Waiting for sync activity...
       </div>
     </div>
+  </main>
 
-    <div class="card col-6">
-      <h2>📂 Watched Folder Connections</h2>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Host Path</th>
-              <th>Mapped Album ID</th>
-            </tr>
-          </thead>
-          <tbody id="folders-table">
-            <tr>
-              <td colspan="2" style="text-align: center; color: var(--zinc-550);">No active watched folders yet.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card col-6">
-      <h2>🖥️ Live Sync Engine Output</h2>
-      <div class="console-panel" id="console-logs">System startup logged. Waiting for sync activity...</div>
-    </div>
-  </div>
-
-  <footer class="dashboard-footer">
-    Studioz Local Agent Engine • Active on Port 8082
+  <footer class="py-6 text-center text-xs text-slate-600 border-t border-slate-800/50 mt-auto">
+    Studioz Local Agent Engine &copy; 2026 &bull; Active on Port 8082
   </footer>
 
   <script>
+    let isRunning = true;
+
     async function copyTunnel() {
       const el = document.getElementById('tunnel-url');
       if (el && el.innerText.startsWith('http')) {
         await navigator.clipboard.writeText(el.innerText);
-        alert('Tunnel URL copied to clipboard!');
+      }
+    }
+
+    async function startEngine() {
+      document.getElementById('btn-start').disabled = true;
+      try {
+        const res = await fetch('/api/engine/start', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          isRunning = true;
+          updateUIState();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      document.getElementById('btn-start').disabled = false;
+    }
+
+    async function stopEngine() {
+      document.getElementById('btn-stop').disabled = true;
+      try {
+        const res = await fetch('/api/engine/stop', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          isRunning = false;
+          updateUIState();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      document.getElementById('btn-stop').disabled = false;
+    }
+
+    function updateUIState() {
+      const badge = document.getElementById('status-badge');
+      const btnStart = document.getElementById('btn-start');
+      const btnStop = document.getElementById('btn-stop');
+
+      if (isRunning) {
+        badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold transition-colors";
+        badge.innerHTML = \`<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> <span>RUNNING</span>\`;
+        btnStart.disabled = true;
+        btnStart.classList.add('opacity-50', 'cursor-not-allowed');
+        btnStop.disabled = false;
+        btnStop.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-semibold transition-colors";
+        badge.innerHTML = \`<span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span> <span>STOPPED</span>\`;
+        btnStart.disabled = false;
+        btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+        btnStop.disabled = true;
+        btnStop.classList.add('opacity-50', 'cursor-not-allowed');
       }
     }
 
@@ -339,44 +230,42 @@ const dashboardHtml = `
         const res = await fetch('/api/status');
         const data = await res.json();
         if (data.success) {
-          document.getElementById('engine-status').innerText = 'ONLINE';
+          if (isRunning !== (data.engineState === 'RUNNING')) {
+            isRunning = (data.engineState === 'RUNNING');
+            updateUIState();
+          }
+
           document.getElementById('folders-count').innerText = data.folders.length;
           document.getElementById('synced-count').innerText = data.stats.SYNCED || 0;
           document.getElementById('pending-count').innerText = data.stats.PENDING || 0;
           document.getElementById('sys-uptime').innerText = data.system.uptime;
-          document.getElementById('sys-mem').innerText = 'Memory: ' + data.system.memory;
+          document.getElementById('sys-mem').innerText = data.system.memory;
           document.getElementById('tunnel-url').innerText = data.tunnelUrl;
-
-          const tbody = document.getElementById('folders-table');
-          if (data.folders.length > 0) {
-            tbody.innerHTML = data.folders.map(f => {
-              const displayPath = f.path.replace('/usr/src/app/watched_photos/', '📂 /');
-              return '<tr><td>' + displayPath + '</td><td><span style="font-family: monospace; font-size: 0.8rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.15rem 0.4rem; border-radius: 0.25rem;">' + f.album_id + '</span></td></tr>';
-            }).join('');
-          } else {
-            tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--zinc-550);">No active watched folders yet.</td></tr>';
-          }
         }
-      } catch (err) {
-        document.getElementById('engine-status').innerText = 'OFFLINE';
+      } catch (e) {
+        document.getElementById('status-badge').className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400 text-sm font-semibold transition-colors";
+        document.getElementById('status-badge').innerHTML = \`<span>OFFLINE</span>\`;
       }
 
       try {
-        const res = await fetch('/api/logs');
-        const data = await res.json();
-        if (data.success && data.logs.length > 0) {
-          const logBox = document.getElementById('console-logs');
-          const isAtBottom = logBox.scrollHeight - logBox.clientHeight <= logBox.scrollTop + 20;
-          logBox.innerText = data.logs.join('\\n');
-          if (isAtBottom) {
-            logBox.scrollTop = logBox.scrollHeight;
+        const logsRes = await fetch('/api/logs');
+        const logsData = await logsRes.json();
+        if (logsData.success) {
+          const consoleEl = document.getElementById('console-logs');
+          // Only auto-scroll if we're near the bottom
+          const isScrolledToBottom = consoleEl.scrollHeight - consoleEl.clientHeight <= consoleEl.scrollTop + 50;
+          
+          consoleEl.innerHTML = logsData.logs.join('\\n');
+          
+          if (isScrolledToBottom) {
+            consoleEl.scrollTop = consoleEl.scrollHeight;
           }
         }
-      } catch (err) {}
+      } catch (e) {}
     }
 
+    setInterval(updateDashboard, 2000);
     updateDashboard();
-    setInterval(updateDashboard, 1500);
   </script>
 </body>
 </html>
@@ -411,6 +300,7 @@ app.get('/api/status', async (req, res) => {
     res.status(200).json({
       success: true,
       status: 'online',
+      engineState: engineState,
       tunnelUrl: tunnelUrl || 'Initializing secure tunnel relay...',
       folders,
       stats,
@@ -763,6 +653,39 @@ app.post('/albums/:albumId/scan', async (req, res) => {
 // Boot dependencies
 let watcher: FolderWatcher;
 let syncClient: SyncClient;
+let engineState: 'RUNNING' | 'STOPPED' = 'RUNNING';
+
+app.post('/api/engine/start', async (req, res) => {
+  if (engineState === 'RUNNING') {
+    return res.json({ success: true, state: engineState, message: 'Already running' });
+  }
+  try {
+    console.log('▶️ START COMMAND RECEIVED: Booting up local engine...');
+    await watcher.initialize();
+    await syncClient.start();
+    engineState = 'RUNNING';
+    res.json({ success: true, state: engineState });
+  } catch (err: any) {
+    console.error('Failed to start engine', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/engine/stop', async (req, res) => {
+  if (engineState === 'STOPPED') {
+    return res.json({ success: true, state: engineState, message: 'Already stopped' });
+  }
+  try {
+    console.log('⏹️ STOP COMMAND RECEIVED: Halting local engine processes...');
+    await watcher.stopAll();
+    syncClient.stop();
+    engineState = 'STOPPED';
+    res.json({ success: true, state: engineState });
+  } catch (err: any) {
+    console.error('Failed to stop engine', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 async function bootstrap() {
   // Ensure SQLite migrations run

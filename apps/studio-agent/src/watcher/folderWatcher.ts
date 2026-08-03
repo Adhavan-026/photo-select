@@ -122,5 +122,18 @@ export class FolderWatcher {
       console.log(`🚫 Unwatched folder: ${folderPath}`);
     }
   }
+
+  async stopAll() {
+    console.log('🛑 Halting all local folder watchers...');
+    for (const [folderPath, watcher] of this.watchers.entries()) {
+      await watcher.close();
+      console.log(`🚫 Unwatched folder: ${folderPath}`);
+    }
+    this.watchers.clear();
+    if (this.changeTimeout) {
+      clearTimeout(this.changeTimeout);
+      this.changeTimeout = null;
+    }
+  }
 }
 export default FolderWatcher;
