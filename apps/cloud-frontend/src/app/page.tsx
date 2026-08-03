@@ -101,18 +101,8 @@ export default function LandingPage() {
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#18041c]/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-[#a855f7]/25 border border-white/10">
-              <img src="/studioz-logo.jpg" alt="Studioz Logo" className="h-full w-full object-cover" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-white font-sans-custom leading-tight">
-                Studioz
-              </span>
-              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase leading-none">
-                powered by Clickone
-              </span>
-            </div>
+          <Link href="/" className="flex items-center">
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-12 w-auto object-contain" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400 font-sans-custom">
