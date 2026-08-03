@@ -460,7 +460,11 @@ app.get('/stream/:imageId', async (req, res, next) => {
     const range = req.headers.range;
 
     // Set appropriate image response headers
-    res.setHeader('Content-Type', 'image/webp');
+    if (filePath.endsWith('.avif')) {
+      res.setHeader('Content-Type', 'image/avif');
+    } else {
+      res.setHeader('Content-Type', 'image/webp');
+    }
     res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year cache
 
     if (range) {
@@ -530,7 +534,11 @@ app.get('/stream/file/:albumId/:filename', async (req, res, next) => {
     const fileSize = stat.size;
     const range = req.headers.range;
 
-    res.setHeader('Content-Type', 'image/webp');
+    if (filePath.endsWith('.avif')) {
+      res.setHeader('Content-Type', 'image/avif');
+    } else {
+      res.setHeader('Content-Type', 'image/webp');
+    }
     res.setHeader('Cache-Control', 'public, max-age=31536000');
 
     if (range) {

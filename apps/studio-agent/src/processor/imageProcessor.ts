@@ -97,9 +97,9 @@ export class ImageProcessor {
     }
 
     // 3. Define output paths
-    const thumbName = `${id}_thumb.webp`;
-    const previewName = `${id}_prev.webp`;
-    const waterName = `${id}_water.webp`;
+    const thumbName = `${id}_thumb.avif`;
+    const previewName = `${id}_prev.avif`;
+    const waterName = `${id}_water.avif`;
 
     const thumbnailPath = path.join(this.outputDir, 'thumbnails', thumbName);
     const previewPath = path.join(this.outputDir, 'previews', previewName);
@@ -108,16 +108,16 @@ export class ImageProcessor {
     // 4. Generate Thumbnail (200px width)
     await sharp(filePath)
       .resize(200, null, { withoutEnlargement: true })
-      .toFormat('webp', { quality: 75 })
+      .toFormat('avif', { quality: 50, speed: 8 })
       .toFile(thumbnailPath);
 
     // 5. Generate Normal Preview (800px width)
     await sharp(filePath)
       .resize(800, null, { withoutEnlargement: true })
-      .toFormat('webp', { quality: 80 })
+      .toFormat('avif', { quality: 55, speed: 8 })
       .toFile(previewPath);
 
-    // 6. Generate Watermarked WebP Preview (1920px width)
+    // 6. Generate Watermarked AVIF Preview (1920px width)
     // Burn text overlay dynamically into the output image buffer
     const safeWatermarkText = escapeXml(watermarkText);
     const svgOverlay = `
@@ -145,7 +145,7 @@ export class ImageProcessor {
           gravity: 'center',
         },
       ])
-      .toFormat('webp', { quality: 85 })
+      .toFormat('avif', { quality: 60, speed: 8 })
       .toFile(watermarkPreviewPath);
 
     return {
