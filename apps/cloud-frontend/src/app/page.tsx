@@ -105,68 +105,50 @@ export default function LandingPage() {
             <img src="/studioz-full-logo.png" alt="Studioz Logo" className="absolute top-1/2 left-0 -translate-y-1/2 h-[180px] w-auto max-w-none object-contain pointer-events-none" />
           </Link>
 
-          {/* Right Side Pill Container */}
-          <div className="hidden md:flex items-center bg-white rounded-full p-1.5 shadow-2xl">
-            <nav className="flex items-center gap-8 px-8 text-sm font-semibold text-zinc-600 font-sans-custom">
-              <a href="#features" className="hover:text-black transition-colors underline-offset-4 hover:underline">Features</a>
-              <a href="#architecture" className="hover:text-black transition-colors underline-offset-4 hover:underline">Architecture</a>
-              <a href="#pricing" className="hover:text-black transition-colors underline-offset-4 hover:underline">Pricing</a>
-              <Link href="/login" className="hover:text-black transition-colors">
+          {/* Right Side Links */}
+          <div className="hidden md:flex items-center gap-8">
+            <nav className="flex items-center gap-8 text-sm font-medium text-slate-300 font-sans-custom">
+              <a href="#features" className="hover:text-white transition-colors">Features</a>
+              <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
+              <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+              <Link href="/login" className="hover:text-white transition-colors">
                 Log in
               </Link>
             </nav>
-            <Link href="/register" className="text-sm font-bold bg-[#f97316] text-white px-8 py-3 rounded-full hover:bg-[#ea580c] transition-colors font-sans-custom shadow-md">
+            <Link href="/register" className="text-sm font-bold bg-[#f97316] text-white px-8 py-2.5 rounded-full hover:bg-[#ea580c] transition-colors font-sans-custom">
               Sign up
             </Link>
           </div>
         </div>
       </header>
 
-      {/* 3D Sandwiched Firewatch Parallax Hero Section */}
-      <section ref={heroRef} className="relative min-h-[92vh] flex flex-col items-center justify-start pt-16 overflow-hidden z-20">
+      {/* Dark Hero Section */}
+      <section ref={heroRef} className="relative min-h-[92vh] flex flex-col items-center justify-center pt-24 pb-16 overflow-hidden z-20 bg-[#0f141e]">
         
-        {/* Layer 0: Sky (Background) */}
-        <motion.div 
-          style={{ y: ySky }} 
-          className="absolute inset-0 bg-gradient-to-b from-[#020617] via-[#0f172a] to-[#1e293b] pointer-events-none z-0"
-        />
+        {/* Layer 0: Camera Lens Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Gradient overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f141e]/80 via-[#0f141e]/40 to-[#0f141e] z-10"></div>
+          {/* Subtle 15% blur camera lens image */}
+          <img 
+            src="/camera-lens-bg.jpg" 
+            alt="Camera Lens Background" 
+            className="absolute inset-0 w-[110%] h-[110%] left-[-5%] top-[-5%] object-cover opacity-20 blur-[15px] scale-105 z-0" 
+          />
+          {/* Color cast glow */}
+          <div className="absolute top-0 right-[-20%] w-[120%] h-[120%] rounded-full bg-blue-900/10 blur-[120px] pointer-events-none z-10"></div>
+        </div>
 
-        {/* Layer 1: Subtle Corporate Glow */}
-        <motion.div 
-          style={{ y: ySky }}
-          className="absolute top-[20%] left-1/2 transform -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-3xl pointer-events-none z-0"
-        />
-
-        {/* Layer 2: Distant Ridge 1 (SVG) */}
-        <motion.div 
-          style={{ y: yMountainBack }}
-          className="absolute bottom-0 left-0 w-full h-[160px] pointer-events-none z-10 opacity-60"
-        >
-          <svg className="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <path fill="#334155" d="M0,180 C240,140 480,240 720,190 C960,140 1200,260 1440,210 L1440,320 L0,320 Z"></path>
-          </svg>
-        </motion.div>
-
-        {/* Layer 3: Midground Ridge 2 (SVG) */}
-        <motion.div 
-          style={{ y: yMountainMid }}
-          className="absolute bottom-0 left-0 w-full h-[120px] pointer-events-none z-15"
-        >
-          <svg className="w-full h-full" viewBox="0 0 1440 240" preserveAspectRatio="none">
-            <path fill="#1e293b" d="M0,120 C360,70 720,180 1080,110 C1260,75 1350,140 1440,130 L1440,240 L0,240 Z"></path>
-          </svg>
-        </motion.div>
-
-        {/* Layer 4: Sandwiched Content (Text & Floating Mockups) */}
+        {/* Layer 4: Sandwiched Content */}
         <motion.div 
           style={{ y: yHeroText, opacity: opacityHeroText }}
-          className="container mx-auto px-6 text-center z-20 pointer-events-auto relative pt-4"
+          className="container mx-auto px-6 text-center z-20 pointer-events-auto relative"
         >
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/20 bg-blue-500/10 text-xs font-semibold text-blue-400 mb-6 backdrop-blur-sm font-sans-custom"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/20 bg-[#161e31] text-xs font-semibold text-blue-400 mb-8 font-sans-custom"
           >
             <Zap className="h-3.5 w-3.5 text-blue-400" />
             <span>Hybrid Cloud Proofing Platform</span>
@@ -176,17 +158,17 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl mx-auto leading-[1.08] font-sans-custom"
+            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-5xl mx-auto leading-[1.1] font-sans-custom"
           >
             Local Photo Streaming. <br />
-            <span className="text-blue-400">Zero Cloud Storage Cost.</span>
+            <span className="text-[#5ea5ff]">Zero Cloud Storage Cost.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-sm md:text-lg text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed font-sans-custom"
+            className="text-sm md:text-[17px] text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed font-sans-custom"
           >
             Never upload raw gigabytes online again. Stream beautiful watermarked proofing previews to clients straight from your local drive.
           </motion.p>
@@ -195,26 +177,16 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 font-sans-custom"
+            className="flex flex-col sm:flex-row items-center justify-center gap-5 font-sans-custom"
           >
-            <Link href="/register" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold px-8 py-4 rounded-full shadow-xl shadow-[#f97316]/20 transition-all">
+            <Link href="/register" className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold px-8 py-3.5 rounded-full shadow-[0_0_40px_rgba(249,115,22,0.4)] hover:shadow-[0_0_50px_rgba(249,115,22,0.5)] transition-all">
               <span>Start Free Trial</span>
               <ArrowRight className="h-4.5 w-4.5" />
             </Link>
-            <a href="#features" className="w-full sm:w-auto flex items-center justify-center gap-2 border border-white/10 bg-white/5 font-semibold px-8 py-4 rounded-full hover:bg-white/10 transition-colors text-zinc-300 backdrop-blur-sm">
+            <a href="#features" className="w-full sm:w-auto flex items-center justify-center gap-2 border border-slate-700 bg-[#1e273b] hover:bg-[#28354c] font-semibold px-8 py-3.5 rounded-full transition-colors text-slate-200 shadow-lg">
               <span>Explore Features</span>
             </a>
           </motion.div>
-        </motion.div>
-
-        {/* Layer 5: Foreground Ridge 3 (SVG - Solid dark) */}
-        <motion.div 
-          style={{ y: yMountainFront }}
-          className="absolute bottom-[-2px] left-0 w-full h-[75px] pointer-events-none z-30"
-        >
-          <svg className="w-full h-full" viewBox="0 0 1440 150" preserveAspectRatio="none">
-            <path fill="#0f172a" d="M0,80 C180,120 360,50 540,70 C720,90 900,40 1080,60 C1260,80 1350,40 1440,50 L1440,150 L0,150 Z"></path>
-          </svg>
         </motion.div>
       </section>
 
