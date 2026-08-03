@@ -70,6 +70,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
 
   // Active Lightbox Overlay
   const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
   
   // Comments Drawer
   const [showComments, setShowComments] = useState(false);
@@ -436,6 +437,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                     alt={img.filename}
                     onClick={() => {
                       setActiveImageIndex(idx);
+                      setImageLoading(true);
                       loadComments(img.id);
                     }}
                     className="w-full h-auto object-cover cursor-zoom-in group-hover:scale-[1.02] transition-transform duration-300"
@@ -486,18 +488,27 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               disabled={activeImageIndex === 0}
               onClick={() => {
                 setActiveImageIndex(activeImageIndex - 1);
+                setImageLoading(true);
                 loadComments(images[activeImageIndex - 1].id);
               }}
-              className="absolute left-6 p-3 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              className="absolute left-6 p-3 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors z-20"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
 
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <div className="w-12 h-12 border-4 border-zinc-700 border-t-white rounded-full animate-spin shadow-xl"></div>
+              </div>
+            )}
             <img
+              key={activeImage.id}
               src={`${streamBase}/file/${album.id}/${activeImage.filename}?size=${isMobile ? 'preview' : 'watermark'}`}
               alt={activeImage.filename}
-              className="max-h-[85vh] max-w-[90%] object-contain rounded-lg"
+              className={`max-h-[85vh] max-w-[90%] object-contain rounded-lg transition-opacity duration-300 relative z-10 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+              onLoad={() => setImageLoading(false)}
               onError={(e) => {
+                setImageLoading(false);
                 (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&auto=format&fit=crop&q=80`;
               }}
             />
@@ -506,9 +517,10 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               disabled={activeImageIndex === images.length - 1}
               onClick={() => {
                 setActiveImageIndex(activeImageIndex + 1);
+                setImageLoading(true);
                 loadComments(images[activeImageIndex + 1].id);
               }}
-              className="absolute right-6 p-3 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              className="absolute right-6 p-3 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors z-20"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
