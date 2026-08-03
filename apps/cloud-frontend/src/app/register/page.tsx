@@ -180,7 +180,7 @@ export default function RegisterPage() {
                     {...register('subdomain')}
                   />
                   <span className="absolute right-4 text-xs font-semibold text-zinc-500">
-                    .photoselect.com
+                    .studioz.clickone.com
                   </span>
                 </div>
                 {errors.subdomain && (

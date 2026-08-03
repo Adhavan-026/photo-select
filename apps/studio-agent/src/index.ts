@@ -56,7 +56,7 @@ const dashboardHtml = `
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhotoSelect Agent Dashboard</title>
+  <title>Studioz Engine Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -248,7 +248,7 @@ const dashboardHtml = `
   <header>
     <div class="header-logo">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-      <span>PhotoSelect Engine Panel</span>
+      <span>Studioz Engine Panel</span>
     </div>
     <div class="status-badge">
       <div class="status-dot"></div>
@@ -322,7 +322,7 @@ const dashboardHtml = `
   </div>
 
   <footer class="dashboard-footer">
-    PhotoSelect Local Agent Engine • Active on Port 8082
+    Studioz Local Agent Engine • Active on Port 8082
   </footer>
 
   <script>
@@ -670,7 +670,7 @@ app.post('/albums/:albumId/scan', async (req, res) => {
         await syncClient.updateAlbumStatus(albumId, 'SCANNING');
 
         const watermarkConfig = await db.get('SELECT value FROM local_config WHERE key = ?', ['watermark_text']);
-        const watermarkText = watermarkConfig?.value || 'PhotoSelect';
+        const watermarkText = watermarkConfig?.value || 'Studioz';
 
         if (fs.existsSync(folder.path)) {
           // Recursive helper to get all photos inside folder (supporting subfolders)

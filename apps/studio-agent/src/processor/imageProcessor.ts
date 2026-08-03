@@ -58,7 +58,7 @@ export class ImageProcessor {
     });
   }
 
-  async processImage(filePath: string, watermarkText = 'PhotoSelect'): Promise<ProcessedResult> {
+  async processImage(filePath: string, watermarkText = 'Studioz'): Promise<ProcessedResult> {
     if (!fs.existsSync(filePath)) {
       throw new Error(`Original file not found: ${filePath}`);
     }

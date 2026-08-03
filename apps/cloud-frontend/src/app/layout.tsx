@@ -3,7 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'PhotoSelect | Premium Wedding Photo Selection SaaS',
+  title: 'Studioz | Premium Wedding Photo Selection SaaS',
   description: 'Enterprise-grade hybrid cloud photo selection platform for photography studios. Share private client galleries with direct range streaming.',
 };
 

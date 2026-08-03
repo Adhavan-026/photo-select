@@ -101,13 +101,18 @@ export default function LandingPage() {
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-[#18041c]/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#e65c40] to-[#ffb830] flex items-center justify-center shadow-lg shadow-[#e65c40]/25">
-              <Camera className="h-5 w-5 text-white" />
+          <Link href="/" className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl overflow-hidden flex items-center justify-center shadow-lg shadow-[#a855f7]/25 border border-white/10">
+              <img src="/studioz-logo.jpg" alt="Studioz Logo" className="h-full w-full object-cover" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white font-sans-custom">
-              Photo<span className="text-[#ffb830]">Select</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold tracking-tight text-white font-sans-custom leading-tight">
+                Studioz
+              </span>
+              <span className="text-[10px] text-zinc-400 font-semibold tracking-wider uppercase leading-none">
+                powered by Clickone
+              </span>
+            </div>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400 font-sans-custom">
@@ -366,7 +371,7 @@ export default function LandingPage() {
           <div>
             <h2 className="text-3xl md:text-5xl font-bold mb-6 font-title tracking-tight text-[#ffe3a1]">The Hybrid Cloud Flow</h2>
             <p className="text-zinc-300 text-sm leading-relaxed mb-8">
-              Traditional proofing requires uploading gigabytes of high-res photos online. **PhotoSelect** bypasses the upload step entirely. Your agent extracts web-optimized previews, starts a secure tunnel, and syncs only the metadata to the cloud. 
+              Traditional proofing requires uploading gigabytes of high-res photos online. **Studioz** bypasses the upload step entirely. Your agent extracts web-optimized previews, starts a secure tunnel, and syncs only the metadata to the cloud. 
             </p>
             <div className="space-y-6">
               <div className="flex gap-4">
@@ -489,7 +494,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/5 py-16 text-center text-sm text-zinc-500 bg-[#18041c]">
         <div className="container mx-auto px-6">
-          <p>© {new Date().getFullYear()} PhotoSelect Systems Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Studioz (powered by Clickone). All rights reserved.</p>
         </div>
       </footer>
     </div>

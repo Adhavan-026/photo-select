@@ -102,7 +102,7 @@ export class SyncClient {
         const { watermarkText } = response.data.settings;
         await db.run(
           'INSERT OR REPLACE INTO local_config (key, value) VALUES (?, ?)',
-          ['watermark_text', watermarkText || 'PhotoSelect']
+          ['watermark_text', watermarkText || 'Studioz']
         );
       }
     } catch (err: any) {

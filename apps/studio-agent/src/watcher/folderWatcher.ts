@@ -58,7 +58,7 @@ export class FolderWatcher {
         
         const db = await getDatabase();
         const watermarkConfig = await db.get('SELECT value FROM local_config WHERE key = ?', ['watermark_text']);
-        const watermarkText = watermarkConfig?.value || 'PhotoSelect';
+        const watermarkText = watermarkConfig?.value || 'Studioz';
 
         // 1. Process image
         const result = await this.imageProcessor.processImage(filePath, watermarkText);

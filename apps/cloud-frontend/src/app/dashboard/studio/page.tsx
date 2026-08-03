@@ -168,7 +168,7 @@ export default function StudioDashboard() {
   // Studio profile metrics
   const [storageUsage, setStorageUsage] = useState<string>('0 B');
   const [activeTunnel, setActiveTunnel] = useState<string>('Tunnel Offline');
-  const [watermark, setWatermark] = useState('PhotoSelect');
+  const [watermark, setWatermark] = useState('Studioz');
   const [events, setEvents] = useState<any[]>([]);
 
   const [isEditingWatermark, setIsEditingWatermark] = useState(false);

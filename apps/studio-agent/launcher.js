@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 console.log('==================================================');
-console.log('       PhotoSelect Studio Engine Controller        ');
+console.log('       Studioz Local Engine Controller        ');
 console.log('==================================================\n');
 
 try {
@@ -24,7 +24,7 @@ try {
   // Get directory where the .exe is running on the host
   const runDir = path.dirname(process.execPath);
   console.log(`📂 Working Directory: ${runDir}`);
-  console.log('🚀 Starting PhotoSelect Sync Engine...');
+  console.log('🚀 Starting Studioz Sync Engine...');
   
   // Run docker compose up in the working directory
   execSync('docker compose up -d', { cwd: runDir, stdio: 'inherit' });
