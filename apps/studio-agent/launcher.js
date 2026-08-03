@@ -1,8 +1,9 @@
 const { execSync, exec } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 console.log('==================================================');
-console.log('       Starting PhotoSelect Studio Agent Launcher  ');
+console.log('       PhotoSelect Studio Engine Controller        ');
 console.log('==================================================\n');
 
 try {
@@ -13,8 +14,6 @@ try {
   console.error('\n❌ ERROR: Docker Desktop is not running!');
   console.log('Please start Docker Desktop on your computer and try again.');
   console.log('\nPress Enter to exit...');
-  
-  // Wait for user input before exiting
   try {
     execSync('pause', { stdio: 'inherit' });
   } catch (e) {}
@@ -25,31 +24,61 @@ try {
   // Get directory where the .exe is running on the host
   const runDir = path.dirname(process.execPath);
   console.log(`📂 Working Directory: ${runDir}`);
-  console.log('🚀 Starting background services (Docker containers)...');
+  console.log('🚀 Starting PhotoSelect Sync Engine...');
   
   // Run docker compose up in the working directory
   execSync('docker compose up -d', { cwd: runDir, stdio: 'inherit' });
   
-  console.log('\n🔌 Local Studio Agent Express server running on port 8080');
-  console.log('🌎 Opening your Studio Dashboard...');
+  console.log('\n🔌 Local Studio Agent Express server running on port 8082');
+  console.log('🖥️ Opening Engine Health & Status Dashboard...');
   
-  // Open the website
-  const url = 'https://photo-select-cloud-frontend.vercel.app/dashboard/studio';
+  const localUrl = 'http://localhost:8082';
+  
+  // Launch in standalone borderless desktop app mode if Chrome or Edge is installed
+  const chromePaths = [
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    path.join(process.env.LOCALAPPDATA || '', 'Google\\Chrome\\Application\\chrome.exe')
+  ];
+  const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+  
+  let launched = false;
   if (process.platform === 'win32') {
-    exec(`start ${url}`);
-  } else if (process.platform === 'darwin') {
-    exec(`open ${url}`);
-  } else {
-    exec(`xdg-open ${url}`);
+    // Try Chrome
+    for (const cPath of chromePaths) {
+      if (fs.existsSync(cPath)) {
+        exec(`"${cPath}" --app=${localUrl}`);
+        launched = true;
+        break;
+      }
+    }
+    
+    // Try Edge
+    if (!launched && fs.existsSync(edgePath)) {
+      exec(`"${edgePath}" --app=${localUrl}`);
+      launched = true;
+    }
   }
   
-  console.log('\n✅ PhotoSelect is running successfully!');
-  console.log('You can minimize this window. Press Ctrl+C or close this window to exit.');
+  // Fallback to normal browser if not win32 or no app mode browser found
+  if (!launched) {
+    if (process.platform === 'win32') {
+      exec(`start ${localUrl}`);
+    } else if (process.platform === 'darwin') {
+      exec(`open ${localUrl}`);
+    } else {
+      exec(`xdg-open ${localUrl}`);
+    }
+  }
+  
+  console.log('\n✅ PhotoSelect Engine is active!');
+  console.log('Keep this console window open to maintain engine runtime.');
+  console.log('Press Ctrl+C or close this window to stop the engine.');
   
   // Keep process alive
   setInterval(() => {}, 1000);
 } catch (err) {
-  console.error('\n❌ Failed to start containers:', err.message);
+  console.error('\n❌ Failed to start engine:', err.message);
   console.log('\nPress Enter to exit...');
   try {
     execSync('pause', { stdio: 'inherit' });
