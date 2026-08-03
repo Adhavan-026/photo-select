@@ -108,13 +108,13 @@ export class ImageProcessor {
     // 4. Generate Thumbnail (200px width)
     await sharp(filePath)
       .resize(200, null, { withoutEnlargement: true })
-      .toFormat('avif', { quality: 50, speed: 8 })
+      .toFormat('avif', { quality: 50 })
       .toFile(thumbnailPath);
 
     // 5. Generate Normal Preview (800px width)
     await sharp(filePath)
       .resize(800, null, { withoutEnlargement: true })
-      .toFormat('avif', { quality: 55, speed: 8 })
+      .toFormat('avif', { quality: 55 })
       .toFile(previewPath);
 
     // 6. Generate Watermarked AVIF Preview (1920px width)
@@ -145,7 +145,7 @@ export class ImageProcessor {
           gravity: 'center',
         },
       ])
-      .toFormat('avif', { quality: 60, speed: 8 })
+      .toFormat('avif', { quality: 60 })
       .toFile(watermarkPreviewPath);
 
     return {
