@@ -428,7 +428,7 @@ export default function StudioDashboard() {
       <header className="border-b border-white/5 bg-[#0d0d11]/50 backdrop-blur-md px-8 py-5 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <a href="/">
-            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[28px] w-auto object-contain cursor-pointer" />
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[64px] w-auto object-contain cursor-pointer" />
           </a>
           <span className="text-[15px] font-semibold tracking-tight text-white/50 border-l border-white/10 pl-3 ml-1 hidden sm:block">
             Studio Dashboard

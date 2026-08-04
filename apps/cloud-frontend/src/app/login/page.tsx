@@ -62,7 +62,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center justify-center mb-8">
-            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain" />
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[80px] w-auto object-contain" />
           </Link>
           <h2 className="text-3xl font-extrabold text-white">Welcome back</h2>
           <p className="mt-2 text-sm text-zinc-400">
