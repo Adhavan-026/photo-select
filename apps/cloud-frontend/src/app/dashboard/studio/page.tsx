@@ -424,25 +424,22 @@ export default function StudioDashboard() {
 
   return (
     <div className="min-h-screen bg-[#08080a] text-zinc-100 flex flex-col font-sans">
-      {/* Top Header */}
-      <header className="border-b border-white/5 bg-[#0d0d11]/50 backdrop-blur-md px-8 py-5 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3">
+      {/* Floating 502x89 Pill Navigation */}
+      <header className="sticky top-6 mx-auto z-40 w-[502px] h-[89px] bg-[#0d0d11]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center justify-between px-8 shadow-2xl mb-8">
+        <div className="flex items-center gap-3 shrink-0">
           <a href="/">
-            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[64px] w-auto object-contain cursor-pointer" />
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain cursor-pointer" />
           </a>
-          <span className="text-[15px] font-semibold tracking-tight text-white/50 border-l border-white/10 pl-3 ml-1 hidden sm:block">
-            Studio Dashboard
-          </span>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <div className="text-sm font-semibold text-white">{user.firstName} {user.lastName}</div>
-            <div className="text-xs text-zinc-500 uppercase tracking-wider">{user.role}</div>
+        <div className="flex items-center gap-4 shrink-0">
+          <div className="text-right hidden sm:block">
+            <div className="text-[13px] font-semibold text-white">{user.firstName}</div>
+            <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{user.role}</div>
           </div>
           <button 
             onClick={logout}
-            className="p-2.5 rounded-xl border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="p-3 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
           >
             <LogOut className="h-4.5 w-4.5" />
           </button>

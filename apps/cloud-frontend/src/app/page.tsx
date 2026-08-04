@@ -98,27 +98,20 @@ export default function LandingPage() {
         }
       `}</style>
 
-      {/* Navigation Header */}
-      <header className="absolute top-0 z-50 w-full pt-8">
-        <div className="container mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center relative h-16 w-48">
-            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="absolute top-1/2 left-0 -translate-y-1/2 h-[180px] w-auto max-w-none object-contain pointer-events-none" />
-          </Link>
+      {/* Floating 502x89 Pill Navigation */}
+      <header className="absolute top-8 left-1/2 -translate-x-1/2 z-50 w-[502px] h-[89px] bg-[#0f141e]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center justify-between px-8 shadow-2xl">
+        <Link href="/" className="flex items-center shrink-0">
+          <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain" />
+        </Link>
 
-          {/* Right Side Links */}
-          <div className="hidden md:flex items-center gap-8">
-            <nav className="flex items-center gap-8 text-sm font-medium text-slate-300 font-sans-custom">
-              <a href="#features" className="hover:text-white transition-colors">Features</a>
-              <a href="#architecture" className="hover:text-white transition-colors">Architecture</a>
-              <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-              <Link href="/login" className="hover:text-white transition-colors">
-                Log in
-              </Link>
-            </nav>
-            <Link href="/register" className="text-sm font-bold bg-[#f97316] text-white px-8 py-2.5 rounded-full hover:bg-[#ea580c] transition-colors font-sans-custom">
-              Sign up
-            </Link>
-          </div>
+        {/* Right Side Links */}
+        <div className="flex items-center gap-5 shrink-0">
+          <Link href="/login" className="text-[15px] font-semibold text-slate-300 hover:text-white transition-colors font-sans-custom">
+            Log in
+          </Link>
+          <Link href="/register" className="text-[15px] font-bold bg-[#f97316] text-white px-6 py-2.5 rounded-full hover:bg-[#ea580c] transition-colors font-sans-custom shadow-lg shadow-[#f97316]/20">
+            Sign up
+          </Link>
         </div>
       </header>
 
