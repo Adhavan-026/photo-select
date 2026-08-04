@@ -427,11 +427,11 @@ export default function StudioDashboard() {
       {/* Top Header */}
       <header className="border-b border-white/5 bg-[#0d0d11]/50 backdrop-blur-md px-8 py-5 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Camera className="h-4.5 w-4.5 text-white" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-white">
-            Photo<span className="text-indigo-400">Select</span> Studio Dashboard
+          <a href="/">
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[28px] w-auto object-contain cursor-pointer" />
+          </a>
+          <span className="text-[15px] font-semibold tracking-tight text-white/50 border-l border-white/10 pl-3 ml-1 hidden sm:block">
+            Studio Dashboard
           </span>
         </div>
 

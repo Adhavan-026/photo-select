@@ -61,13 +61,8 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center gap-2.5 mb-6">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg">
-              <Camera className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">
-              Photo<span className="text-indigo-400">Select</span>
-            </span>
+          <Link href="/" className="inline-flex items-center justify-center mb-8">
+            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain" />
           </Link>
           <h2 className="text-3xl font-extrabold text-white">Welcome back</h2>
           <p className="mt-2 text-sm text-zinc-400">
