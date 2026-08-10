@@ -342,56 +342,25 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
 
   if (error || !album) {
     return (
-      <div className="min-h-screen bg-[#08080a] flex items-center justify-center text-red-400 px-6 text-center">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-red-400 px-6 text-center font-sans">
         {error || 'Album not found.'}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-zinc-200 font-sans flex flex-col">
-      {/* Gallery Header */}
-      <header className="border-b border-white/5 bg-[#08080a]/80 backdrop-blur-md sticky top-0 z-30 px-8 py-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">{album.name}</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">{album.description}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {images.length > 0 && (
-            album.status === 'COMPLETED' ? (
-              <div className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-1.5 cursor-default">
-                <Lock className="h-3.5 w-3.5" />
-                <span>Selection Locked</span>
-              </div>
-            ) : (
-              <button
-                onClick={handleSubmitSelection}
-                disabled={submittingSelection || selectionSubmitted}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 ${
-                  selectionSubmitted
-                    ? 'bg-emerald-600/10 border-emerald-500/20 text-emerald-400 cursor-default'
-                    : 'bg-indigo-600 border-indigo-500 hover:bg-indigo-500 text-white cursor-pointer active:scale-95 disabled:opacity-50'
-                }`}
-              >
-                {submittingSelection ? (
-                  <span>Submitting...</span>
-                ) : selectionSubmitted ? (
-                  <>
-                    <Check className="h-4 w-4" />
-                    <span>Selection Submitted</span>
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-3.5 w-3.5" />
-                    <span>Submit Selection ({images.filter(img => img.selections?.some(s => s.clientId === clientId && s.isSelected)).length})</span>
-                  </>
-                )}
-              </button>
-            )
-          )}
-          <div className="h-9 w-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-            <Camera className="h-4.5 w-4.5" />
-          </div>
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-200 font-sans flex flex-col relative pb-32">
+      {/* Cinematic Hero Header */}
+      <header className="relative w-full py-24 flex flex-col items-center justify-center text-center overflow-hidden border-b border-white/5 bg-[#0d0d11]">
+        {/* Subtle blurred background element */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#15151a] to-[#0a0a0a] z-0"></div>
+        <div className="absolute top-[-50%] left-1/2 -translate-x-1/2 w-[80%] h-full rounded-full bg-amber-500/5 blur-[120px] pointer-events-none z-0"></div>
+        
+        <div className="relative z-10 max-w-3xl px-6 flex flex-col items-center">
+          <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain mb-10 opacity-70" />
+          <h1 className="text-4xl md:text-5xl font-serif text-white tracking-wide mb-4">{album.name}</h1>
+          <div className="w-12 h-[1px] bg-amber-500/50 mb-4"></div>
+          <p className="text-sm md:text-base text-zinc-400 font-light tracking-widest uppercase">{album.description}</p>
         </div>
       </header>
 
@@ -430,7 +399,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               return (
                 <div 
                   key={img.id} 
-                  className="break-inside-avoid relative rounded-xl overflow-hidden group bg-[#0d0d11] border border-white/5 hover:border-indigo-500/30 transition-colors"
+                  className="break-inside-avoid relative rounded-sm overflow-hidden group bg-[#0a0a0a] shadow-md hover:shadow-xl transition-all duration-500"
                 >
                   <img
                     src={imgSrc}
@@ -440,7 +409,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                       setImageLoading(true);
                       loadComments(img.id);
                     }}
-                    className="w-full h-auto object-cover cursor-zoom-in group-hover:scale-[1.02] transition-transform duration-300"
+                    className="w-full h-auto object-cover cursor-zoom-in group-hover:scale-[1.02] transition-transform duration-500"
                     loading="lazy"
                     onError={(e) => {
                       // Fallback layout if Cloudflare tunnel offline
@@ -448,17 +417,17 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                     }}
                   />
                   
-                  {/* Floating Action Bars */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Glassmorphism Action Bars */}
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-[-10px] group-hover:translate-y-0">
                     <button
                       onClick={() => handleSelectToggle(img, 'isFavorite')}
-                      className={`p-2 rounded-lg backdrop-blur-md border border-white/10 transition-colors ${isFav ? 'bg-indigo-600 text-white' : 'bg-[#08080a]/60 text-zinc-400 hover:text-white'}`}
+                      className={`p-2.5 rounded-full backdrop-blur-xl border border-white/10 transition-colors ${isFav ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'bg-black/40 text-white/70 hover:text-white hover:bg-black/60'}`}
                     >
                       <Heart className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} />
                     </button>
                     <button
                       onClick={() => handleSelectToggle(img, 'isSelected')}
-                      className={`p-2 rounded-lg backdrop-blur-md border border-white/10 transition-colors ${isSel ? 'bg-emerald-600 text-white' : 'bg-[#08080a]/60 text-zinc-400 hover:text-white'}`}
+                      className={`p-2.5 rounded-full backdrop-blur-xl border border-white/10 transition-colors ${isSel ? 'bg-white text-black shadow-lg' : 'bg-black/40 text-white/70 hover:text-white hover:bg-black/60'}`}
                     >
                       <CheckCircle className="h-4 w-4" />
                     </button>
@@ -538,14 +507,14 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               <div className="flex gap-4">
                 <button
                   onClick={() => handleSelectToggle(activeImage, 'isFavorite')}
-                  className={`flex-1 py-3 rounded-xl border border-white/5 flex items-center justify-center gap-2 transition-colors text-sm font-semibold ${activeImage.selections?.find(s => s.clientId === clientId)?.isFavorite ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white'}`}
+                  className={`flex-1 py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 transition-all text-sm font-semibold shadow-sm ${activeImage.selections?.find(s => s.clientId === clientId)?.isFavorite ? 'bg-amber-500 text-black border-amber-500/50 shadow-amber-500/20' : 'bg-[#15151a] text-zinc-400 hover:text-white hover:bg-[#1a1a24]'}`}
                 >
                   <Heart className="h-4.5 w-4.5" fill={activeImage.selections?.find(s => s.clientId === clientId)?.isFavorite ? 'currentColor' : 'none'} />
                   <span>Favorite</span>
                 </button>
                 <button
                   onClick={() => handleSelectToggle(activeImage, 'isSelected')}
-                  className={`flex-1 py-3 rounded-xl border border-white/5 flex items-center justify-center gap-2 transition-colors text-sm font-semibold ${activeImage.selections?.find(s => s.clientId === clientId)?.isSelected ? 'bg-emerald-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white'}`}
+                  className={`flex-1 py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 transition-all text-sm font-semibold shadow-sm ${activeImage.selections?.find(s => s.clientId === clientId)?.isSelected ? 'bg-white text-black border-white/50' : 'bg-[#15151a] text-zinc-400 hover:text-white hover:bg-[#1a1a24]'}`}
                 >
                   <CheckCircle className="h-4.5 w-4.5" />
                   <span>Select</span>
@@ -584,17 +553,65 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                 placeholder="Type a comment..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-xs"
+                className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-xs"
               />
               <button
                 type="submit"
                 disabled={postingComment || !commentText.trim()}
-                className="w-full mt-2.5 py-2 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold"
+                className="w-full mt-2.5 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 disabled:opacity-50 text-white text-xs font-semibold transition-colors"
               >
                 Post Comment
               </button>
             </form>
 
+          </div>
+        </div>
+      )}
+
+      {/* Floating Action Bar (Bottom Center) */}
+      {images.length > 0 && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[500px]">
+          <div className="bg-[#15151a]/90 backdrop-blur-2xl border border-white/10 rounded-full px-6 py-4 flex items-center justify-between shadow-2xl shadow-black/50 gap-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                <span className="text-white font-bold text-sm">
+                  {images.filter(img => img.selections?.some(s => s.clientId === clientId && s.isSelected)).length}
+                </span>
+              </div>
+              <span className="text-zinc-400 font-medium text-sm hidden sm:block">
+                Photos Selected
+              </span>
+            </div>
+            {album.status === 'COMPLETED' ? (
+              <div className="px-6 py-3 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-zinc-400 flex items-center gap-2 cursor-default">
+                <Lock className="h-4 w-4" />
+                <span>Selection Locked</span>
+              </div>
+            ) : (
+              <button
+                onClick={handleSubmitSelection}
+                disabled={submittingSelection || selectionSubmitted}
+                className={`px-6 sm:px-8 py-3 rounded-full text-sm font-semibold transition-all flex items-center gap-2 shadow-lg ${
+                  selectionSubmitted
+                    ? 'bg-white/10 text-white cursor-default border border-white/20'
+                    : 'bg-amber-500 hover:bg-amber-400 text-black cursor-pointer active:scale-95 disabled:opacity-50 border border-amber-400/50 shadow-amber-500/20'
+                }`}
+              >
+                {submittingSelection ? (
+                  <span>Submitting...</span>
+                ) : selectionSubmitted ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span>Submitted</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    <span>Submit to Studio</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       )}
