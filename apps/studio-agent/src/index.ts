@@ -50,26 +50,34 @@ app.use(express.json());
 
 const PORT = process.env.AGENT_PORT || 8080;
 
-const dashboardHtml = `
+const dashboardHtml = \`
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Studioz Engine Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          fontFamily: { 
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif']
+          },
           colors: {
-            slate: {
-              850: '#151e2c',
-              900: '#0f172a',
-              950: '#020617',
+            onyx: {
+              900: '#0a0a0a',
+              800: '#15151a',
+              700: '#1a1a24'
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706'
             }
           }
         }
@@ -77,11 +85,12 @@ const dashboardHtml = `
     }
   </script>
 </head>
-<body class="bg-slate-950 text-slate-200 font-sans min-h-screen flex flex-col">
-  <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-lg">
+<body class="bg-onyx-900 text-slate-200 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
+  <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gold-500/5 blur-[150px] pointer-events-none"></div>
+  <header class="sticky top-0 z-50 bg-onyx-900/80 backdrop-blur-md border-b border-white/5 px-6 py-4 flex justify-between items-center shadow-lg">
     <div class="flex items-center gap-3">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-      <span class="text-xl font-bold text-white tracking-tight">Studioz <span class="text-slate-400 font-normal">Engine</span></span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gold-500"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      <span class="text-xl font-serif text-white tracking-wide">Studioz <span class="text-slate-500 font-sans text-sm font-normal uppercase tracking-widest ml-1">Engine</span></span>
     </div>
     <div class="flex items-center gap-4">
       <div id="status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-semibold transition-colors">
@@ -94,20 +103,20 @@ const dashboardHtml = `
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
     
     <!-- Control Panel -->
-    <div class="md:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="md:col-span-12 bg-onyx-800/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
       <div>
         <h2 class="text-lg font-semibold text-white mb-1">Engine Controls</h2>
         <p class="text-sm text-slate-400">Manage the local background synchronization engine.</p>
       </div>
       <div class="flex items-center gap-3">
-        <button id="btn-start" onclick="startEngine()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+        <button id="btn-start" onclick="startEngine()" class="px-6 py-2.5 bg-gold-500 hover:bg-gold-400 text-black font-semibold rounded-lg shadow-lg shadow-gold-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
           Start Engine
         </button>
-        <button id="btn-stop" onclick="stopEngine()" class="px-6 py-2.5 bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/50 text-slate-300 font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+        <button id="btn-stop" onclick="stopEngine()" class="px-6 py-2.5 bg-onyx-700 hover:bg-rose-500/20 hover:text-rose-400 border border-white/5 hover:border-rose-500/50 text-slate-300 font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
           Stop Engine
         </button>
@@ -115,51 +124,51 @@ const dashboardHtml = `
     </div>
 
     <!-- Stats Cards -->
-    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-blue-400">📁</span> Watched Folders</h3>
+    <div class="md:col-span-3 bg-onyx-800/60 backdrop-blur-lg border border-white/5 rounded-xl p-5 shadow-lg">
+      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-gold-400">📁</span> Watched Folders</h3>
       <div class="text-3xl font-bold text-white" id="folders-count">0</div>
     </div>
-    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+    <div class="md:col-span-3 bg-onyx-800/60 backdrop-blur-lg border border-white/5 rounded-xl p-5 shadow-lg">
       <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-emerald-400">✅</span> Synced Photos</h3>
       <div class="text-3xl font-bold text-emerald-400" id="synced-count">0</div>
     </div>
-    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
-      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-amber-400">⏳</span> Pending Sync</h3>
-      <div class="text-3xl font-bold text-amber-400" id="pending-count">0</div>
+    <div class="md:col-span-3 bg-onyx-800/60 backdrop-blur-lg border border-white/5 rounded-xl p-5 shadow-lg">
+      <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-rose-400">⏳</span> Pending Sync</h3>
+      <div class="text-3xl font-bold text-rose-400" id="pending-count">0</div>
     </div>
-    <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+    <div class="md:col-span-3 bg-onyx-800/60 backdrop-blur-lg border border-white/5 rounded-xl p-5 shadow-lg">
       <h3 class="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2"><span class="text-purple-400">⚙️</span> System</h3>
       <div class="text-xl font-bold text-white mb-1" id="sys-uptime">0s</div>
       <div class="text-xs text-slate-500" id="sys-mem">Memory: --</div>
     </div>
 
     <!-- Cloud Link -->
-    <div class="md:col-span-12 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex items-center justify-between gap-4">
+    <div class="md:col-span-12 bg-onyx-800/60 backdrop-blur-lg border border-white/5 rounded-xl p-5 shadow-lg flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <span class="text-lg">🔗</span>
         <div>
           <div class="text-sm font-medium text-slate-300">Secure Cloud Tunnel</div>
-          <div class="font-mono text-xs text-blue-400 break-all" id="tunnel-url">Initializing...</div>
+          <div class="font-mono text-xs text-gold-400 break-all" id="tunnel-url">Initializing...</div>
         </div>
       </div>
-      <button onclick="copyTunnel()" class="shrink-0 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-lg transition-colors border border-slate-700">Copy URL</button>
+      <button onclick="copyTunnel()" class="shrink-0 px-4 py-2 bg-onyx-700 hover:bg-onyx-900 text-slate-300 text-sm font-medium rounded-lg transition-colors border border-white/5">Copy URL</button>
     </div>
 
     <!-- Live Feed -->
-    <div class="md:col-span-12 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg flex flex-col h-[400px]">
-      <div class="px-5 py-3 border-b border-slate-800 bg-slate-850 flex items-center gap-2">
+    <div class="md:col-span-12 bg-onyx-800/60 backdrop-blur-lg border border-white/5 rounded-xl overflow-hidden shadow-lg flex flex-col h-[400px]">
+      <div class="px-5 py-3 border-b border-white/5 bg-onyx-700/50 flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
         <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
         <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
         <span class="ml-2 text-xs font-medium text-slate-500 uppercase tracking-wider">Live Engine Console</span>
       </div>
-      <div class="flex-1 p-5 overflow-y-auto font-mono text-xs text-slate-400 leading-relaxed bg-[#0a0f18]" id="console-logs">
+      <div class="flex-1 p-5 overflow-y-auto font-mono text-xs text-slate-400 leading-relaxed bg-onyx-900/50" id="console-logs">
         System startup logged. Waiting for sync activity...
       </div>
     </div>
   </main>
 
-  <footer class="py-6 text-center text-xs text-slate-600 border-t border-slate-800/50 mt-auto">
+  <footer class="py-6 text-center text-xs text-slate-600 border-t border-white/5 mt-auto relative z-10">
     Studioz Local Agent Engine &copy; 2026 &bull; Active on Port 8082
   </footer>
 
@@ -269,7 +278,7 @@ const dashboardHtml = `
   </script>
 </body>
 </html>
-`;
+\`;
 
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');

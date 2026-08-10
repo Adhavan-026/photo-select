@@ -416,14 +416,14 @@ export default function StudioDashboard() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#08080a] flex items-center justify-center text-zinc-400">
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-zinc-400">
         Loading workspace context...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 flex flex-col font-sans">
       {/* Floating 502x89 Pill Navigation */}
       <header className="sticky top-6 mx-auto z-40 w-[502px] h-[89px] bg-[#0d0d11]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center justify-between px-8 shadow-2xl mb-8">
         <div className="flex items-center gap-3 shrink-0">
@@ -453,9 +453,9 @@ export default function StudioDashboard() {
         <div className="lg:col-span-1 space-y-6">
           
           {/* Card 1: Studio Details */}
-          <div className="glass-panel p-6 rounded-2xl">
+          <div className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl">
             <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Database className="h-4 w-4 text-indigo-400" />
+              <Database className="h-4 w-4 text-amber-500" />
               <span>Studio Workspace</span>
             </h3>
             <div className="space-y-4">
@@ -465,7 +465,7 @@ export default function StudioDashboard() {
               </div>
               <div>
                 <div className="text-xs text-zinc-500">Relay Tunnel</div>
-                <div className="text-xs font-mono text-indigo-300 mt-1 break-all bg-indigo-500/5 p-2 rounded-lg border border-indigo-500/10">
+                <div className="text-xs font-mono text-amber-400 mt-1 break-all bg-amber-500/5 p-2 rounded-lg border border-amber-500/10">
                   {activeTunnel}
                 </div>
               </div>
@@ -475,7 +475,7 @@ export default function StudioDashboard() {
                   {!isEditingWatermark ? (
                     <button
                       onClick={handleEditWatermarkClick}
-                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+                      className="text-[10px] text-amber-500 hover:text-amber-400 font-semibold cursor-pointer"
                     >
                       Edit
                     </button>
@@ -487,12 +487,12 @@ export default function StudioDashboard() {
                       type="text"
                       value={tempWatermark}
                       onChange={(e) => setTempWatermark(e.target.value)}
-                      className="flex-1 text-xs text-white bg-white/5 border border-white/10 rounded px-2 py-1 focus:outline-none focus:border-indigo-500 min-w-0"
+                      className="flex-1 text-xs text-white bg-white/5 border border-white/10 rounded px-2 py-1 focus:outline-none focus:border-amber-500 min-w-0"
                     />
                     <button
                       onClick={handleSaveWatermark}
                       disabled={updatingWatermark}
-                      className="px-2 py-1 bg-indigo-600 text-white rounded text-[10px] font-semibold cursor-pointer hover:bg-indigo-500 disabled:opacity-50 shrink-0"
+                      className="px-2 py-1 bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white rounded text-[10px] font-semibold cursor-pointer hover:bg-amber-400 disabled:opacity-50 shrink-0"
                     >
                       Save
                     </button>
@@ -511,9 +511,9 @@ export default function StudioDashboard() {
           </div>
 
           {/* Card 2: License / Plan */}
-          <div className="glass-panel p-6 rounded-2xl">
+          <div className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl">
             <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-indigo-400" />
+              <ShieldCheck className="h-4 w-4 text-amber-500" />
               <span>License Status</span>
             </h3>
             <div className="space-y-4">
@@ -533,9 +533,9 @@ export default function StudioDashboard() {
           </div>
 
           {/* Card 3: Recent Activity Log */}
-          <div className="glass-panel p-6 rounded-2xl">
+          <div className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl">
             <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-indigo-400" />
+              <Activity className="h-4 w-4 text-amber-500" />
               <span>Recent Activity</span>
             </h3>
             <div className="space-y-4">
@@ -557,15 +557,15 @@ export default function StudioDashboard() {
         <div className="lg:col-span-3 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
-                <ImageIcon className="h-6 w-6 text-indigo-400" />
+              <h2 className="text-2xl font-serif text-white tracking-wide flex items-center gap-2">
+                <ImageIcon className="h-6 w-6 text-amber-500" />
                 <span>Wedding Albums</span>
               </h2>
               <p className="text-xs text-zinc-500 mt-0.5">Manage collections, view sync loads, and share links with clients.</p>
             </div>
             <button 
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors cursor-pointer shadow-lg shadow-indigo-600/10"
+              className="flex items-center gap-2 bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 hover:bg-amber-400 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors cursor-pointer shadow-lg shadow-amber-500/20"
             >
               <Plus className="h-4 w-4" />
               <span>Create Album</span>
@@ -584,7 +584,7 @@ export default function StudioDashboard() {
               <p className="text-zinc-600 text-xs max-w-sm mx-auto mb-6">Create your first client album and use the Studio Agent to sync photos from your computer.</p>
               <button 
                 onClick={() => setShowModal(true)}
-                className="bg-indigo-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl"
+                className="bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white text-xs font-semibold px-4 py-2.5 rounded-xl"
               >
                 Create Album
               </button>
@@ -592,7 +592,7 @@ export default function StudioDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {albums.map((album) => (
-                <div key={album.id} className="glass-panel p-6 rounded-2xl flex flex-col justify-between hover:border-indigo-500/30 transition-colors">
+                <div key={album.id} className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl flex flex-col justify-between hover:border-amber-500/30 transition-colors">
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs text-zinc-500">
@@ -603,12 +603,12 @@ export default function StudioDashboard() {
                           album.status === 'COMPLETED'
                             ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                             : album.status === 'SUBMITTED'
-                            ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                            ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                             : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
                         }`}>
                           {album.status || 'PENDING'}
                         </span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${album.isPrivate ? 'bg-indigo-500/10 text-indigo-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${album.isPrivate ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-400'}`}>
                           {album.isPrivate ? 'Private' : 'Public'}
                         </span>
                       </div>
@@ -625,7 +625,7 @@ export default function StudioDashboard() {
                         <div>
                           <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-sans-custom">
                             <span className="flex items-center gap-1.5">
-                              <RefreshCw className="h-3.5 w-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '3s' }} />
+                              <RefreshCw className="h-3.5 w-3.5 text-amber-500 animate-spin" style={{ animationDuration: '3s' }} />
                               <span>
                                 {album.status === 'SCANNING' ? 'Scanning folder...' :
                                  album.status === 'PROCESSING' ? 'Processing previews...' :
@@ -633,7 +633,7 @@ export default function StudioDashboard() {
                               </span>
                             </span>
                             {album.totalImages > 0 && (
-                              <span className="font-semibold text-indigo-300">
+                              <span className="font-semibold text-amber-400">
                                 {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
                               </span>
                             )}
@@ -641,7 +641,7 @@ export default function StudioDashboard() {
                           {album.totalImages > 0 && (
                             <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
+                                className="bg-amber-500 h-1.5 rounded-full transition-all duration-500" 
                                 style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
                               />
                             </div>
@@ -683,7 +683,7 @@ export default function StudioDashboard() {
                     <div className="flex items-center gap-4">
                       <button 
                         onClick={() => handleCopyLink(album.slug)}
-                        className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-semibold cursor-pointer"
+                        className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-400 transition-colors font-semibold cursor-pointer"
                       >
                         {copiedSlug === album.slug ? (
                           <>
@@ -749,7 +749,7 @@ export default function StudioDashboard() {
                     setAlbumName(e.target.value);
                     setAlbumSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                   }}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                 />
               </div>
 
@@ -759,7 +759,7 @@ export default function StudioDashboard() {
                   placeholder="Wedding Ceremony of John and Jane"
                   value={albumDesc}
                   onChange={(e) => setAlbumDesc(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm h-20 resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm h-20 resize-none"
                 />
               </div>
 
@@ -771,7 +771,7 @@ export default function StudioDashboard() {
                   placeholder="john-jane-2026"
                   value={albumSlug}
                   onChange={(e) => setAlbumSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                 />
               </div>
 
@@ -782,7 +782,7 @@ export default function StudioDashboard() {
                   placeholder="e.g. wedding_emma (creates in Pictures)"
                   value={localFolderName}
                   onChange={(e) => setLocalFolderName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                 />
                 <p className="text-[10px] text-zinc-500 mt-1">The local agent will automatically create and watch this folder inside C:\Users\adhav\Pictures.</p>
               </div>
@@ -798,7 +798,7 @@ export default function StudioDashboard() {
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center gap-2 transition-colors"
+                  className="px-5 py-2.5 rounded-xl bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 hover:bg-amber-400 text-white font-semibold flex items-center gap-2 transition-colors"
                 >
                   {isCreating ? 'Creating...' : 'Create Album'}
                 </button>
@@ -829,7 +829,7 @@ export default function StudioDashboard() {
 
             <div className="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
               {/* Selected stats bar */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-indigo-500/5 border border-indigo-500/10 p-4 rounded-xl gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-zinc-300">
                   <div>
                     Total Selected: <span className="font-bold text-white">
@@ -840,13 +840,13 @@ export default function StudioDashboard() {
                   <div className="flex bg-zinc-900/50 p-1 rounded-lg border border-white/5">
                     <button
                       onClick={() => setViewFilter('selected')}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'selected' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'selected' ? 'bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
                     >
                       Selected Only
                     </button>
                     <button
                       onClick={() => setViewFilter('all')}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'all' ? 'bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
                     >
                       All Images
                     </button>
@@ -855,7 +855,7 @@ export default function StudioDashboard() {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => handleExportFilenames('lightroom')}
-                    className="flex items-center gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 text-xs bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 hover:bg-amber-400 text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer"
                   >
                     <Copy className="h-3.5 w-3.5" />
                     <span>Copy for Lightroom / Capture One</span>
@@ -986,9 +986,9 @@ export default function StudioDashboard() {
           const pct = Math.round((synced / total) * 100);
 
           return (
-            <div key={album.id} className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#18041c]/95 border border-indigo-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
+            <div key={album.id} className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#15151a]/95 border border-amber-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
+                <div className="h-9 w-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
                   <RefreshCw className="h-5 w-5 animate-spin" style={{ animationDuration: '3s' }} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -997,12 +997,12 @@ export default function StudioDashboard() {
                   
                   <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-2 font-mono">
                     <span>{synced} / {total} photos</span>
-                    <span className="text-indigo-400 font-bold">{pct}%</span>
+                    <span className="text-amber-500 font-bold">{pct}%</span>
                   </div>
                   
                   <div className="w-full bg-white/5 border border-white/5 rounded-full h-1 mt-1.5 overflow-hidden">
                     <div 
-                      className="bg-gradient-to-r from-indigo-500 to-violet-500 h-1 rounded-full transition-all duration-500"
+                      className="bg-amber-500 h-1 rounded-full transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -1014,7 +1014,7 @@ export default function StudioDashboard() {
 
       {/* Floating Completed Sync Success Toast */}
       {completedToast && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#18041c]/95 border border-emerald-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#15151a]/95 border border-emerald-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
               <Check className="h-5 w-5" />

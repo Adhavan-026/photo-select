@@ -87,16 +87,16 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#08080a] px-6 py-12 relative">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/5 blur-[150px] pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-6 py-12 relative overflow-hidden">
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-amber-500/5 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#f59e0b]/5 blur-[150px] pointer-events-none" />
 
       <div className="w-full max-w-lg space-y-8 relative z-10">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center justify-center mb-8">
             <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[80px] w-auto object-contain" />
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">Create your studio</h2>
+          <h2 className="text-3xl font-serif text-white tracking-wide">Create your studio</h2>
           <p className="mt-2 text-sm text-zinc-400">
             Set up your studio workspace and start sharing local previews.
           </p>
@@ -153,8 +153,8 @@ export default function RegisterPage() {
                 <input
                   id="name"
                   type="text"
-                  placeholder="Doe Weddings Co."
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                  placeholder="Photography Studio"
+                  className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                   {...register('name')}
                 />
                 {errors.name && (
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                     id="subdomain"
                     type="text"
                     placeholder="doeweddings"
-                    className="w-full pl-4 pr-32 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                    className="w-full pl-4 pr-32 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                     {...register('subdomain')}
                   />
                   <span className="absolute right-4 text-xs font-semibold text-zinc-500">
@@ -190,8 +190,8 @@ export default function RegisterPage() {
                 <input
                   id="ownerEmail"
                   type="email"
-                  placeholder="owner@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                   {...register('ownerEmail')}
                 />
                 {errors.ownerEmail && (
@@ -207,7 +207,7 @@ export default function RegisterPage() {
                   id="ownerPasswordHash"
                   type="password"
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                   {...register('ownerPasswordHash')}
                 />
                 {errors.ownerPasswordHash && (
@@ -218,7 +218,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-4 mt-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-indigo-600/10"
+                className="w-full py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/50 text-black font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-amber-500/20"
               >
                 {isSubmitting ? (
                   <>
@@ -249,13 +249,13 @@ export default function RegisterPage() {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                   placeholder="123456"
-                  className="w-full text-center tracking-[1em] font-mono text-xl px-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full text-center tracking-[1em] font-mono text-xl px-4 py-3.5 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500 transition-colors"
                 />
 
                 <button
                   type="submit"
                   disabled={verifyingOtp || otpCode.length !== 6}
-                  className="w-full py-3.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className="w-full py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/50 text-black font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-amber-500/20"
                 >
                   {verifyingOtp ? (
                     <>
@@ -273,7 +273,7 @@ export default function RegisterPage() {
           {step === 'form' && (
             <div className="mt-6 text-center text-xs text-zinc-500">
               Already have an account?{' '}
-              <Link href="/login" className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+              <Link href="/login" className="text-amber-500 hover:text-amber-400 font-semibold transition-colors">
                 Log in
               </Link>
             </div>

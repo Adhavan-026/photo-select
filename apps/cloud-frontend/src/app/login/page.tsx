@@ -55,16 +55,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#08080a] px-6 py-12 relative">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/5 blur-[150px] pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-6 py-12 relative overflow-hidden">
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-amber-500/5 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#f59e0b]/5 blur-[150px] pointer-events-none" />
 
       <div className="w-full max-w-md space-y-8 relative z-10">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center justify-center mb-8">
             <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[80px] w-auto object-contain" />
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">Welcome back</h2>
+          <h2 className="text-3xl font-serif text-white tracking-wide">Welcome back</h2>
           <p className="mt-2 text-sm text-zinc-400">
             Log in to manage your studio, upload folders, or select photos.
           </p>
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                 {...register('email')}
               />
               {errors.email && (
@@ -100,7 +100,7 @@ export default function LoginPage() {
                 <label htmlFor="password" className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                   Password
                 </label>
-                <Link href="/forgot-password" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+                <Link href="/forgot-password" className="text-xs text-amber-500 hover:text-amber-400 transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -108,7 +108,7 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
                 {...register('password')}
               />
               {errors.password && (
@@ -119,7 +119,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 text-white font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-indigo-600/10"
+              className="w-full py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:bg-amber-500/50 text-black font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-amber-500/20"
             >
               {isSubmitting ? (
                 <>
@@ -134,7 +134,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center text-xs text-zinc-500">
             Don't have an account?{' '}
-            <Link href="/register" className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">
+            <Link href="/register" className="text-amber-500 hover:text-amber-400 font-semibold transition-colors">
               Sign up
             </Link>
           </div>
