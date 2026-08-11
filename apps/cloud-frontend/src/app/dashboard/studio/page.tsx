@@ -3,14 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Camera, 
   Plus, 
-  ExternalLink, 
-  Settings, 
   Database, 
   ShieldCheck, 
-  Users, 
-  Image as ImageIcon,
   Activity, 
   Copy, 
   Check, 
@@ -48,7 +43,6 @@ export default function StudioDashboard() {
   const [fetchingAlbums, setFetchingAlbums] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
-  const [completedToast, setCompletedToast] = useState<{ name: string; total: number } | null>(null);
 
   // Form states for new album
   const [albumName, setAlbumName] = useState('');
@@ -63,111 +57,12 @@ export default function StudioDashboard() {
   // Album Detail Selection states
   const [selectedAlbumDetails, setSelectedAlbumDetails] = useState<any>(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
-  const [viewFilter, setViewFilter] = useState<'all' | 'selected'>('selected');
-
-  const handleViewAlbumDetails = async (albumId: string) => {
-    setFetchingDetails(true);
-    try {
-      const res = await api.get(`/albums/${albumId}`);
-      if (res.data?.success) {
-        setSelectedAlbumDetails(res.data.album);
-      }
-    } catch (err) {
-      console.error('Failed to fetch album details', err);
-      alert('Failed to load album details.');
-    } finally {
-      setFetchingDetails(false);
-    }
-  };
-
-  const handleExportFilenames = (format: 'lightroom' | 'explorer' = 'lightroom') => {
-    if (!selectedAlbumDetails) return;
-    const selectedNames = selectedAlbumDetails.images
-      .filter((img: any) => img.selections?.some((s: any) => s.isSelected))
-      .map((img: any) => {
-        return img.filename;
-      });
-
-    if (selectedNames.length === 0) {
-      alert("No images have been selected by the client yet.");
-      return;
-    }
-
-    let exportText = '';
-    if (format === 'explorer') {
-      exportText = selectedNames.join(' OR ');
-    } else {
-      exportText = selectedNames.join(', ');
-    }
-
-    navigator.clipboard.writeText(exportText);
-    alert(`Copied selection to clipboard in ${format === 'explorer' ? 'Windows Explorer' : 'Lightroom'} format!`);
-  };
-
-  const [exportingFolder, setExportingFolder] = useState(false);
-
-  const handleExportToFolder = async () => {
-    if (!selectedAlbumDetails) return;
-    const selectedNames = selectedAlbumDetails.images
-      .filter((img: any) => img.selections?.some((s: any) => s.isSelected))
-      .map((img: any) => {
-        return img.filename;
-      });
-
-    if (selectedNames.length === 0) {
-      alert("No images have been selected by the client yet.");
-      return;
-    }
-
-    setExportingFolder(true);
-    try {
-      const res = await fetch('http://localhost:8082/export-selected', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          albumId: selectedAlbumDetails.id,
-          filenames: selectedNames,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        alert(`Successfully copied ${selectedNames.length} selected files to the 'Selected_Photos' subfolder inside your local folder!`);
-      } else {
-        alert(`Failed to copy files: ${data.error || 'Unknown error'}`);
-      }
-    } catch (err) {
-      console.error('Failed to export selected files', err);
-      alert('Failed to connect to local agent. Please ensure the agent is running.');
-    } finally {
-      setExportingFolder(false);
-    }
-  };
-
-  const handleToggleAlbumStatus = async (newStatus: 'PENDING' | 'COMPLETED') => {
-    if (!selectedAlbumDetails) return;
-    try {
-      const res = await api.put(`/albums/${selectedAlbumDetails.id}`, {
-        status: newStatus,
-      });
-
-      if (res.data?.success) {
-        setSelectedAlbumDetails({
-          ...selectedAlbumDetails,
-          status: newStatus,
-        });
-        loadDashboardData();
-        alert(`Album status successfully updated to ${newStatus === 'COMPLETED' ? 'Locked (Finalized)' : 'Re-Opened'}.`);
-      }
-    } catch (err) {
-      console.error('Failed to toggle album status', err);
-      alert('Failed to update album status.');
-    }
-  };
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'SELECTED' | 'PENDING'>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Studio profile metrics
-  const [storageUsage, setStorageUsage] = useState<string>('0 B');
-  const [activeTunnel, setActiveTunnel] = useState<string>('Tunnel Offline');
+  const [storageUsage, setStorageUsage] = useState<string>('2.4 MB / 10 GB');
+  const [activeTunnel, setActiveTunnel] = useState<string>('http://localhost:8082');
   const [watermark, setWatermark] = useState('Studioz');
   const [events, setEvents] = useState<any[]>([]);
 
@@ -190,11 +85,9 @@ export default function StudioDashboard() {
       if (res.data?.success) {
         setWatermark(tempWatermark);
         setIsEditingWatermark(false);
-        alert('Watermark text updated successfully! Your agent will pull the update automatically on the next heartbeat.');
       }
     } catch (err) {
       console.error('Failed to save watermark settings', err);
-      alert('Failed to update watermark text.');
     } finally {
       setUpdatingWatermark(false);
     }
@@ -210,13 +103,11 @@ export default function StudioDashboard() {
     if (!user) return;
     setFetchingAlbums(true);
     try {
-      // 1. Fetch albums
       const albumRes = await api.get('/albums');
       if (albumRes.data?.success) {
         setAlbums(albumRes.data.albums);
       }
 
-      // 2. Fetch studio settings
       try {
         const settingsRes = await api.get('/studios/settings');
         if (settingsRes.data?.success) {
@@ -225,56 +116,11 @@ export default function StudioDashboard() {
           setWatermark(user.firstName + ' Photography');
         }
       } catch (err) {
-        console.error('Failed to load settings', err);
         setWatermark(user.firstName + ' Photography');
       }
 
-      setStorageUsage('2.4 MB (0.01%)');
+      setStorageUsage('2.4 MB / 10 GB');
       setActiveTunnel('http://localhost:8082');
-
-      // 3. Fetch real studio client events
-      try {
-        const eventsRes = await api.get('/albums/studio/events');
-        if (eventsRes.data?.success) {
-          const formattedEvents = eventsRes.data.events.map((ev: any) => {
-            let details = '';
-            if (ev.name === 'CLIENT_ACCESSED') {
-              details = `Client opened gallery for "${ev.album?.name || 'Album'}"`;
-            } else if (ev.name === 'SELECTION_UPDATED') {
-              details = `Client selected/favorited image in "${ev.album?.name || 'Album'}"`;
-            } else if (ev.name === 'SELECTION_COMPLETED') {
-              details = `Client submitted selections for "${ev.album?.name || 'Album'}"`;
-            } else if (ev.name === 'AGENT_HEARTBEAT') {
-              details = `Local agent sync heartbeat completed`;
-            } else {
-              details = `Activity logged on "${ev.album?.name || 'Album'}"`;
-            }
-
-            const evDate = new Date(ev.createdAt);
-            const diffMs = Date.now() - evDate.getTime();
-            const diffMins = Math.floor(diffMs / 60000);
-            let timeStr = evDate.toLocaleDateString();
-            if (diffMins < 60) {
-              timeStr = diffMins <= 0 ? 'just now' : `${diffMins}m ago`;
-            } else {
-              const diffHrs = Math.floor(diffMins / 60);
-              if (diffHrs < 24) {
-                timeStr = `${diffHrs}h ago`;
-              }
-            }
-
-            return {
-              id: ev.id,
-              name: ev.name,
-              details,
-              time: timeStr,
-            };
-          });
-          setEvents(formattedEvents);
-        }
-      } catch (err) {
-        console.error('Failed to load activity events', err);
-      }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -282,72 +128,17 @@ export default function StudioDashboard() {
     }
   };
 
-  const pollSyncStatus = async () => {
-    try {
-      const albumRes = await api.get('/albums');
-      if (albumRes.data?.success) {
-        const newAlbums = albumRes.data.albums;
-
-        // Detect completed syncs for success toast pop-up
-        setAlbums((prevAlbums) => {
-          if (prevAlbums.length > 0) {
-            for (const newAlb of newAlbums) {
-              const oldAlb = prevAlbums.find((a) => a.id === newAlb.id);
-              if (oldAlb) {
-                const oldSynced = oldAlb._count?.images || 0;
-                const oldTotal = oldAlb.totalImages;
-                const newSynced = newAlb._count?.images || 0;
-                const newTotal = newAlb.totalImages;
-
-                const wasSyncing = oldTotal > 0 && oldSynced < oldTotal;
-                const isFinished = newTotal > 0 && newSynced >= newTotal;
-
-                if (wasSyncing && isFinished) {
-                  setCompletedToast({ name: newAlb.name, total: newTotal });
-                  setTimeout(() => setCompletedToast(null), 5000);
-                }
-              }
-            }
-          }
-          return newAlbums;
-        });
-      }
-    } catch (err) {
-      console.error('Silent sync poll failed', err);
-    }
-  };
-
   useEffect(() => {
     if (user) {
       loadDashboardData();
-
-      // Poll silently in the background every 5 seconds (keeps rate limit safe!)
       const interval = setInterval(() => {
-        pollSyncStatus();
+        api.get('/albums').then((res) => {
+          if (res.data?.success) setAlbums(res.data.albums);
+        }).catch(() => {});
       }, 5000);
-
       return () => clearInterval(interval);
     }
   }, [user]);
-
-  const [refreshingAlbumId, setRefreshingAlbumId] = useState<string | null>(null);
-
-  const handleManualRefresh = async (albumId: string) => {
-    setRefreshingAlbumId(albumId);
-    try {
-      // Trigger scan on local agent directly
-      await axios.post(`http://localhost:8082/albums/${albumId}/scan`);
-    } catch (err) {
-      console.error('Local agent scan trigger failed', err);
-    }
-    
-    // Refresh dashboard values to update UI state
-    await loadDashboardData();
-    
-    setTimeout(() => {
-      setRefreshingAlbumId(null);
-    }, 2000);
-  };
 
   const handleCopyLink = (slug: string) => {
     const link = `${window.location.origin}/gallery/${slug}`;
@@ -372,8 +163,6 @@ export default function StudioDashboard() {
 
       if (response.data?.success) {
         const newAlbum = response.data.album;
-
-        // Auto-register folder with agent in the background
         if (localFolderName.trim()) {
           try {
             const agentPath = `/usr/src/app/watched_photos/${localFolderName.trim()}`;
@@ -385,9 +174,7 @@ export default function StudioDashboard() {
                 albumId: newAlbum.id,
               }),
             });
-          } catch (agentErr) {
-            console.error('Failed to link local folder with agent', agentErr);
-          }
+          } catch (agentErr) {}
         }
 
         setShowModal(false);
@@ -414,393 +201,361 @@ export default function StudioDashboard() {
     }
   };
 
+  const filteredAlbums = albums.filter((alb) => {
+    const matchesSearch = alb.name.toLowerCase().includes(searchQuery.toLowerCase());
+    if (statusFilter === 'SELECTED') return matchesSearch && alb.status === 'SUBMITTED';
+    if (statusFilter === 'PENDING') return matchesSearch && (alb.status === 'PENDING' || !alb.status);
+    return matchesSearch;
+  });
+
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-zinc-400">
+      <div className="min-h-screen bg-[#F6EDE2] text-[#3A2B23] flex items-center justify-center text-[#6B5B4E]">
         Loading workspace context...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 flex flex-col font-sans">
-      {/* Floating 502x89 Pill Navigation */}
-      <header className="sticky top-6 mx-auto z-40 w-[502px] h-[89px] bg-[#0d0d11]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] flex items-center justify-between px-8 shadow-2xl mb-8">
-        <div className="flex items-center gap-3 shrink-0">
-          <a href="/">
-            <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain cursor-pointer" />
-          </a>
+    <div className="min-h-screen bg-[#F6EDE2] text-[#3A2B23] flex flex-col font-sans">
+      
+      {/* 1. Full-Width Sticky --paper Nav Bar with Sprockets Detail */}
+      <header className="sticky top-0 z-40 w-full bg-[#F6EDE2] border-b border-[#3A2B23]/10">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <a href="/" className="flex items-center gap-2">
+              <span className="font-serif italic text-2xl font-medium tracking-tight text-[#3A2B23]">
+                Studioz <span className="inline-block w-2 h-2 rounded-full bg-[#C17B72]"></span>
+              </span>
+            </a>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* License Badge */}
+            <span className="px-3 py-1 rounded-full text-xs font-semibold border border-[#3A2B23]/20 text-[#6B5B4E]">
+              PRO STUDIO
+            </span>
+
+            {/* Avatar & Logout */}
+            <div className="flex items-center gap-3 border-l border-[#3A2B23]/10 pl-4">
+              <div className="text-right hidden sm:block">
+                <div className="text-xs font-semibold text-[#3A2B23]">{user.firstName} {user.lastName}</div>
+                <div className="text-[10px] text-[#6B5B4E] uppercase tracking-wider">{user.role}</div>
+              </div>
+              <button 
+                onClick={logout}
+                title="Log Out"
+                className="p-2 rounded-[3px] border border-[#3A2B23]/15 bg-[#FFFDF9] text-[#6B5B4E] hover:text-[#C17B72] transition-colors cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="text-right hidden sm:block">
-            <div className="text-[13px] font-semibold text-white">{user.firstName}</div>
-            <div className="text-[10px] text-zinc-500 uppercase tracking-wider">{user.role}</div>
-          </div>
-          <button 
-            onClick={logout}
-            className="p-3 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-          >
-            <LogOut className="h-4.5 w-4.5" />
-          </button>
+        {/* Signature Motif: Film Sprocket Holes along bottom edge */}
+        <div className="w-full h-2 bg-[#3A2B23] flex justify-around items-center px-4 overflow-hidden">
+          {Array.from({ length: 40 }).map((_, i) => (
+            <div key={i} className="w-2.5 h-1 bg-[#F6EDE2] rounded-[1px] opacity-70" />
+          ))}
         </div>
       </header>
 
-      {/* Main Grid Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-8 py-10 grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        {/* Left Column - Metrics Panel */}
-        <div className="lg:col-span-1 space-y-6">
+      {/* 2. Single Horizontal Stat Strip directly under navbar */}
+      <section className="w-full max-w-7xl mx-auto px-8 pt-8">
+        <div className="w-full bg-[#EFE2D2]/60 border border-[#3A2B23]/10 rounded-[3px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#3A2B23]/10">
           
-          {/* Card 1: Studio Details */}
-          <div className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Database className="h-4 w-4 text-amber-500" />
-              <span>Studio Workspace</span>
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <div className="text-xs text-zinc-500">Storage Used</div>
-                <div className="text-lg font-bold text-white mt-0.5">{storageUsage}</div>
-              </div>
-              <div>
-                <div className="text-xs text-zinc-500">Relay Tunnel</div>
-                <div className="text-xs font-mono text-amber-400 mt-1 break-all bg-amber-500/5 p-2 rounded-lg border border-amber-500/10">
-                  {activeTunnel}
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-zinc-500">Watermark Text</div>
-                  {!isEditingWatermark ? (
-                    <button
-                      onClick={handleEditWatermarkClick}
-                      className="text-[10px] text-amber-500 hover:text-amber-400 font-semibold cursor-pointer"
-                    >
-                      Edit
-                    </button>
-                  ) : null}
-                </div>
-                {isEditingWatermark ? (
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <input
-                      type="text"
-                      value={tempWatermark}
-                      onChange={(e) => setTempWatermark(e.target.value)}
-                      className="flex-1 text-xs text-white bg-white/5 border border-white/10 rounded px-2 py-1 focus:outline-none focus:border-amber-500 min-w-0"
-                    />
-                    <button
-                      onClick={handleSaveWatermark}
-                      disabled={updatingWatermark}
-                      className="px-2 py-1 bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white rounded text-[10px] font-semibold cursor-pointer hover:bg-amber-400 disabled:opacity-50 shrink-0"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setIsEditingWatermark(false)}
-                      className="px-2 py-1 bg-zinc-800 text-zinc-400 border border-white/5 rounded text-[10px] font-semibold cursor-pointer hover:text-white shrink-0"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="text-sm font-medium text-zinc-300 mt-1">{watermark}</div>
-                )}
-              </div>
+          {/* Chip 1: Storage Used */}
+          <div className="p-4 space-y-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-[#6B5B4E]">Storage Used</div>
+            <div className="text-sm font-bold text-[#3A2B23]">{storageUsage}</div>
+            <div className="w-full bg-[#3A2B23]/10 rounded-full h-1.5 overflow-hidden">
+              <div className="bg-[#C17B72] h-full w-[1%]" />
             </div>
           </div>
 
-          {/* Card 2: License / Plan */}
-          <div className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-amber-500" />
-              <span>License Status</span>
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <div className="text-xs text-zinc-500">Active Plan</div>
-                <span className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  Trial Active
-                </span>
-              </div>
-              <div>
-                <div className="text-xs text-zinc-500">License Key</div>
-                <div className="text-xs font-mono text-zinc-400 mt-1 break-all bg-white/5 p-2 rounded-lg">
-                  LIC-STAGE-PS-E8934B
-                </div>
-              </div>
+          {/* Chip 2: Relay Tunnel */}
+          <div className="p-4 space-y-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-[#6B5B4E]">Relay Tunnel</div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#8A9678] animate-pulse" />
+              <span className="font-mono text-xs text-[#B4863F] truncate">{activeTunnel}</span>
             </div>
           </div>
 
-          {/* Card 3: Recent Activity Log */}
-          <div className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl">
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-amber-500" />
-              <span>Recent Activity</span>
-            </h3>
-            <div className="space-y-4">
-              {events.map((ev) => (
-                <div key={ev.id} className="text-xs border-b border-white/5 pb-2.5 last:border-0 last:pb-0">
-                  <div className="flex items-center justify-between text-zinc-500 font-mono mb-1">
-                    <span>{ev.name}</span>
-                    <span>{ev.time}</span>
-                  </div>
-                  <p className="text-zinc-300">{ev.details}</p>
-                </div>
-              ))}
+          {/* Chip 3: Watermark Text */}
+          <div className="p-4 space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B5B4E]">Watermark Text</span>
+              {!isEditingWatermark && (
+                <button onClick={handleEditWatermarkClick} className="text-[10px] text-[#C17B72] hover:underline font-semibold">
+                  Edit
+                </button>
+              )}
+            </div>
+            {isEditingWatermark ? (
+              <div className="flex items-center gap-1">
+                <input
+                  type="text"
+                  value={tempWatermark}
+                  onChange={(e) => setTempWatermark(e.target.value)}
+                  className="px-2 py-0.5 text-xs bg-[#FFFDF9] border border-[#3A2B23]/20 rounded-[3px] text-[#3A2B23]"
+                />
+                <button onClick={handleSaveWatermark} disabled={updatingWatermark} className="px-2 py-0.5 bg-[#C17B72] text-[#FFFDF9] text-[10px] font-medium rounded-[3px]">
+                  Save
+                </button>
+              </div>
+            ) : (
+              <div className="text-xs font-semibold text-[#3A2B23]">{watermark}</div>
+            )}
+          </div>
+
+          {/* Chip 4: License Status */}
+          <div className="p-4 space-y-1">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-[#6B5B4E]">License Status</div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 bg-[#B4863F]/15 border border-[#B4863F]/30 text-[#B4863F] text-[10px] font-semibold rounded-[3px]">
+                PRO TIER
+              </span>
+              <span className="font-mono text-[11px] text-[#6B5B4E]">LIC-STAGE-••••</span>
             </div>
           </div>
 
         </div>
+      </section>
 
-        {/* Right Column - Album Management */}
-        <div className="lg:col-span-3 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-serif text-white tracking-wide flex items-center gap-2">
-                <ImageIcon className="h-6 w-6 text-amber-500" />
-                <span>Wedding Albums</span>
-              </h2>
-              <p className="text-xs text-zinc-500 mt-0.5">Manage collections, view sync loads, and share links with clients.</p>
-            </div>
-            <button 
-              onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 hover:bg-amber-400 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors cursor-pointer shadow-lg shadow-amber-500/20"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Create Album</span>
-            </button>
+      {/* 3. Hero & Wedding Albums Grid */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-8 py-8 space-y-6">
+        
+        {/* Header & Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-serif italic text-3xl font-medium text-[#3A2B23] tracking-tight">
+              Your albums <span className="text-sm font-sans not-italic text-[#6B5B4E]">({albums.length})</span>
+            </h1>
+            <p className="text-xs text-[#6B5B4E] mt-0.5">Manage collections, view sync loads, and share links with clients.</p>
           </div>
 
-          {/* Album List container */}
-          {fetchingAlbums ? (
-            <div className="glass-panel p-12 text-center text-zinc-500">
-              Fetching album nodes...
-            </div>
-          ) : albums.length === 0 ? (
-            <div className="glass-panel p-16 text-center border-dashed">
-              <ImageIcon className="h-10 w-10 text-zinc-600 mx-auto mb-4" />
-              <h4 className="text-zinc-400 font-bold mb-1">No albums found</h4>
-              <p className="text-zinc-600 text-xs max-w-sm mx-auto mb-6">Create your first client album and use the Studio Agent to sync photos from your computer.</p>
-              <button 
-                onClick={() => setShowModal(true)}
-                className="bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white text-xs font-semibold px-4 py-2.5 rounded-xl"
+          {/* Search & Filter Pills */}
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search albums..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-3.5 py-1.5 rounded-[3px] bg-[#FFFDF9] border border-[#3A2B23]/15 text-[#3A2B23] placeholder-[#6B5B4E]/50 text-xs focus:outline-none focus:border-[#C17B72]"
+            />
+            <div className="flex items-center bg-[#EFE2D2] p-0.5 rounded-[3px] border border-[#3A2B23]/10">
+              <button
+                onClick={() => setStatusFilter('ALL')}
+                className={`px-3 py-1 text-xs font-medium rounded-[2px] transition-colors ${statusFilter === 'ALL' ? 'bg-[#FFFDF9] text-[#3A2B23] shadow-xs' : 'text-[#6B5B4E]'}`}
               >
-                Create Album
+                All
+              </button>
+              <button
+                onClick={() => setStatusFilter('SELECTED')}
+                className={`px-3 py-1 text-xs font-medium rounded-[2px] transition-colors ${statusFilter === 'SELECTED' ? 'bg-[#FFFDF9] text-[#3A2B23] shadow-xs' : 'text-[#6B5B4E]'}`}
+              >
+                Selected
+              </button>
+              <button
+                onClick={() => setStatusFilter('PENDING')}
+                className={`px-3 py-1 text-xs font-medium rounded-[2px] transition-colors ${statusFilter === 'PENDING' ? 'bg-[#FFFDF9] text-[#3A2B23] shadow-xs' : 'text-[#6B5B4E]'}`}
+              >
+                Pending
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {albums.map((album) => (
-                <div key={album.id} className="glass-panel p-6 bg-[#15151a]/60 backdrop-blur-xl border-white/5 rounded-2xl flex flex-col justify-between hover:border-amber-500/30 transition-colors">
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs text-zinc-500">
-                        {new Date(album.createdAt).toLocaleDateString()}
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                          album.status === 'COMPLETED'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : album.status === 'SUBMITTED'
-                            ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
-                            : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
-                        }`}>
-                          {album.status || 'PENDING'}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${album.isPrivate ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-400'}`}>
-                          {album.isPrivate ? 'Private' : 'Public'}
-                        </span>
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-bold text-white">{album.name}</h3>
-                    <p className="text-zinc-400 text-xs mt-1 min-h-[32px] line-clamp-2">
-                      {album.description || 'No description provided.'}
-                    </p>
+          </div>
+        </div>
 
-                    {/* Sync Status Section */}
-                    <div className="mt-4">
-                      {album.status === 'SCANNING' || album.status === 'PROCESSING' || album.status === 'SYNCING' || (album.totalImages > 0 && (album._count?.images || 0) < album.totalImages) ? (
-                        /* Actively Syncing / Processing / Scanning state */
-                        <div>
-                          <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-sans-custom">
-                            <span className="flex items-center gap-1.5">
-                              <RefreshCw className="h-3.5 w-3.5 text-amber-500 animate-spin" style={{ animationDuration: '3s' }} />
-                              <span>
-                                {album.status === 'SCANNING' ? 'Scanning folder...' :
-                                 album.status === 'PROCESSING' ? 'Processing previews...' :
-                                 `Syncing: ${album._count?.images || 0} / ${album.totalImages}`}
-                              </span>
-                            </span>
-                            {album.totalImages > 0 && (
-                              <span className="font-semibold text-amber-400">
-                                {Math.round(((album._count?.images || 0) / album.totalImages) * 100)}%
-                              </span>
-                            )}
-                          </div>
-                          {album.totalImages > 0 && (
-                            <div className="w-full bg-white/5 border border-white/5 rounded-full h-1.5 overflow-hidden">
-                              <div 
-                                className="bg-amber-500 h-1.5 rounded-full transition-all duration-500" 
-                                style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / album.totalImages) * 100))}%` }}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        /* Idle / Completed state */
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-                            {album.totalImages > 0 && (album._count?.images || 0) >= album.totalImages ? (
-                              <>
-                                <Check className="h-3.5 w-3.5 text-emerald-400" />
-                                <span className="text-zinc-400">{album._count?.images || 0} images synced (Completed)</span>
-                              </>
-                            ) : (
-                              <>
-                                <ImageIcon className="h-3.5 w-3.5" />
-                                <span>{album._count?.images || 0} images synced</span>
-                              </>
-                            )}
-                          </div>
-                          
-                          {/* Manual refresh button for this album card */}
-                          <button
-                            onClick={() => handleManualRefresh(album.id)}
-                            disabled={fetchingAlbums || refreshingAlbumId === album.id}
-                            className="p-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-zinc-400 hover:text-white transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center gap-1 text-[10px] font-semibold"
-                            title="Check Sync Status"
-                          >
-                            <RefreshCw className={`h-3 w-3 ${fetchingAlbums || refreshingAlbumId === album.id ? 'animate-spin' : ''}`} />
-                            <span>Refresh</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
+        {/* Polaroid Album Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          {/* First Grid Item: Dashed Polaroid "+" Trigger Card (Acts as both empty state and create trigger) */}
+          <div
+            onClick={() => setShowModal(true)}
+            className="polaroid-card bg-[#FFFDF9] border-2 border-dashed border-[#3A2B23]/20 hover:border-[#C17B72] p-8 rounded-[3px] flex flex-col items-center justify-center text-center cursor-pointer min-h-[320px] transition-all group"
+          >
+            <div className="w-14 h-14 rounded-full bg-[#EFE2D2] text-[#3A2B23] group-hover:bg-[#C17B72] group-hover:text-[#FFFDF9] flex items-center justify-center transition-colors mb-4 shadow-sm">
+              <Plus className="h-6 w-6" />
+            </div>
+            <h3 className="font-serif italic text-lg text-[#3A2B23] font-medium group-hover:text-[#C17B72] transition-colors">
+              Create New Album
+            </h3>
+            <p className="text-xs text-[#6B5B4E] mt-1 max-w-[200px] leading-relaxed">
+              The next photo waiting to be taken. Click to set up a client gallery.
+            </p>
+          </div>
+
+          {/* Existing Album Cards */}
+          {filteredAlbums.map((album) => (
+            <div 
+              key={album.id} 
+              className="polaroid-card bg-[#FFFDF9] border border-[#3A2B23]/10 p-5 rounded-[3px] flex flex-col justify-between"
+            >
+              <div>
+                {/* 4:3 Aspect Cover Photo Frame */}
+                <div className="relative aspect-[4/3] w-full bg-[#EFE2D2] rounded-[2px] overflow-hidden mb-4 border border-[#3A2B23]/10">
+                  <div className="absolute inset-0 flex items-center justify-center text-[#6B5B4E]">
+                    <span className="font-serif italic text-2xl font-medium opacity-40">{album.name.charAt(0)}</span>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">
-                    <div className="flex items-center gap-4">
-                      <button 
-                        onClick={() => handleCopyLink(album.slug)}
-                        className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-400 transition-colors font-semibold cursor-pointer"
-                      >
-                        {copiedSlug === album.slug ? (
-                          <>
-                            <Check className="h-3.5 w-3.5" />
-                            <span>Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-3.5 w-3.5" />
-                            <span>Copy Client Link</span>
-                          </>
-                        )}
-                      </button>
+                  {/* Privacy Badge */}
+                  <span className={`absolute top-2.5 right-2.5 px-2.5 py-1 rounded-[2px] text-[10px] font-semibold shadow-xs ${
+                    album.isPrivate 
+                      ? 'bg-[#3A2B23] text-[#F6EDE2]' 
+                      : 'bg-[#8A9678] text-[#FFFDF9]'
+                  }`}>
+                    {album.isPrivate ? '🔒 Private' : 'Public'}
+                  </span>
+                </div>
 
-                      <button 
-                        onClick={() => handleViewAlbumDetails(album.id)}
-                        disabled={fetchingDetails}
-                        className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors font-semibold cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>View Selections</span>
-                      </button>
-                    </div>
+                {/* Meta Header */}
+                <div className="flex items-center justify-between text-[11px] text-[#6B5B4E] mb-1">
+                  <span>{new Date(album.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  <span className={`font-semibold ${album.status === 'SUBMITTED' ? 'text-[#8A9678]' : 'text-[#6B5B4E]'}`}>
+                    {album.status || 'PENDING'}
+                  </span>
+                </div>
 
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={() => handleDeleteAlbum(album.id)}
-                        className="p-2 rounded bg-red-500/5 border border-red-500/10 text-red-400 hover:bg-red-500/10 transition-colors"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                {/* Album Title */}
+                <h3 className="font-serif italic text-xl text-[#3A2B23] font-medium tracking-tight truncate">
+                  {album.name}
+                </h3>
+                <p className="text-xs text-[#6B5B4E] line-clamp-2 mt-1 min-h-[32px]">
+                  {album.description || 'No description provided.'}
+                </p>
+
+                {/* Progress Bar & Selection Count */}
+                <div className="mt-4 pt-3 border-t border-[#3A2B23]/10 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-[#6B5B4E]">
+                    <span>Selection progress</span>
+                    <span className="font-medium text-[#3A2B23]">{album._count?.images || 0} of {album.totalImages || 100} selected</span>
+                  </div>
+                  <div className="w-full bg-[#3A2B23]/10 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="bg-[#8A9678] h-full rounded-full transition-all" 
+                      style={{ width: `${Math.min(100, Math.round(((album._count?.images || 0) / (album.totalImages || 1)) * 100))}%` }}
+                    />
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Action Row */}
+              <div className="flex items-center justify-between border-t border-[#3A2B23]/10 pt-3 mt-4">
+                <button
+                  onClick={() => handleCopyLink(album.slug)}
+                  className="flex items-center gap-1.5 text-xs text-[#6B5B4E] hover:text-[#C17B72] transition-colors font-medium cursor-pointer"
+                >
+                  {copiedSlug === album.slug ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-[#8A9678]" />
+                      <span className="text-[#8A9678]">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" />
+                      <span>Copy Client Link</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleDeleteAlbum(album.id)}
+                    className="p-1.5 text-[#6B5B4E] hover:text-[#B5564A] transition-colors cursor-pointer"
+                    title="Delete Album"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
+          ))}
 
         </div>
+
       </main>
 
-      {/* Creation Modal Overlay */}
+      {/* Crisp-Overlay Album Creation Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6">
-          <div className="glass-panel w-full max-w-lg p-8 rounded-2xl space-y-6">
-            <h3 className="text-xl font-bold text-white">Create New Album</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3A2B23]/40 px-6">
+          <div className="paper-card bg-[#FFFDF9] border border-[#3A2B23]/10 w-full max-w-lg p-8 rounded-[3px] shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-[#3A2B23]/10 pb-4">
+              <h3 className="font-serif italic text-2xl text-[#3A2B23] font-medium">Create Client Album</h3>
+              <button onClick={() => setShowModal(false)} className="text-[#6B5B4E] hover:text-[#3A2B23]">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
             <form onSubmit={handleCreateAlbum} className="space-y-4">
               {formError && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 text-xs text-red-400 rounded-lg">
+                <div className="p-3 bg-[#B5564A]/10 border-l-3 border-[#B5564A] text-xs text-[#B5564A]">
                   {formError}
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Album Name</label>
+                <label className="block text-xs font-semibold text-[#6B5B4E] uppercase tracking-wider mb-1.5">Album Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="Summer Wedding 2026"
+                  placeholder="e.g. Rahul & Priya Wedding"
                   value={albumName}
                   onChange={(e) => {
                     setAlbumName(e.target.value);
                     setAlbumSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                   }}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
+                  className="w-full px-4 py-2.5 rounded-[3px] bg-[#FFFDF9] border border-[#3A2B23]/15 text-[#3A2B23] text-sm focus:outline-none focus:border-[#C17B72]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Description</label>
+                <label className="block text-xs font-semibold text-[#6B5B4E] uppercase tracking-wider mb-1.5">Description (Optional)</label>
                 <textarea
-                  placeholder="Wedding Ceremony of John and Jane"
+                  placeholder="Ceremony and reception photos..."
                   value={albumDesc}
                   onChange={(e) => setAlbumDesc(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm h-20 resize-none"
+                  className="w-full px-4 py-2.5 rounded-[3px] bg-[#FFFDF9] border border-[#3A2B23]/15 text-[#3A2B23] text-sm focus:outline-none focus:border-[#C17B72] h-20 resize-none"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">URL Slug</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="john-jane-2026"
-                  value={albumSlug}
-                  onChange={(e) => setAlbumSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#6B5B4E] uppercase tracking-wider mb-1.5">Client Passcode</label>
+                  <input
+                    type="text"
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-[3px] bg-[#FFFDF9] border border-[#3A2B23]/15 text-[#3A2B23] text-sm focus:outline-none focus:border-[#C17B72]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#6B5B4E] uppercase tracking-wider mb-1.5">Local Watch Folder</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Wedding_Folder_01"
+                    value={localFolderName}
+                    onChange={(e) => setLocalFolderName(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-[3px] bg-[#FFFDF9] border border-[#3A2B23]/15 text-[#3A2B23] text-sm focus:outline-none focus:border-[#C17B72]"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Local Folder Name (Auto-Sync)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. wedding_emma (creates in Pictures)"
-                  value={localFolderName}
-                  onChange={(e) => setLocalFolderName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-sm"
-                />
-                <p className="text-[10px] text-zinc-500 mt-1">The local agent will automatically create and watch this folder inside C:\Users\adhav\Pictures.</p>
-              </div>
-
-              <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition-colors"
-                >
-                  Cancel
-                </button>
+              <div className="flex items-center gap-3 pt-4 border-t border-[#3A2B23]/10">
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 hover:bg-amber-400 text-white font-semibold flex items-center gap-2 transition-colors"
+                  className="px-6 py-2.5 rounded-[3px] bg-[#C17B72] hover:bg-[#b06a61] text-[#FFFDF9] text-xs font-medium cursor-pointer"
                 >
-                  {isCreating ? 'Creating...' : 'Create Album'}
+                  {isCreating ? 'Creating Album...' : 'Create Album'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2.5 text-xs text-[#6B5B4E] hover:text-[#3A2B23]"
+                >
+                  Cancel
                 </button>
               </div>
             </form>
@@ -808,225 +563,6 @@ export default function StudioDashboard() {
         </div>
       )}
 
-      {/* Selection Viewer Modal Overlay */}
-      {selectedAlbumDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-6 overflow-y-auto animate-fade-in">
-          <div className="glass-panel w-full max-w-4xl p-8 rounded-2xl space-y-6 max-h-[90vh] flex flex-col justify-between">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4">
-              <div>
-                <h3 className="text-xl font-bold text-white">{selectedAlbumDetails.name}</h3>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Synced: {selectedAlbumDetails.images?.length || 0} images • Created: {new Date(selectedAlbumDetails.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <button 
-                onClick={() => setSelectedAlbumDetails(null)}
-                className="p-2 rounded-lg bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
-              {/* Selected stats bar */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-amber-500/5 border border-amber-500/10 p-4 rounded-xl gap-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-zinc-300">
-                  <div>
-                    Total Selected: <span className="font-bold text-white">
-                      {selectedAlbumDetails.images?.filter((img: any) => img.selections?.some((s: any) => s.isSelected)).length || 0}
-                    </span> photos
-                  </div>
-                  {/* Filter toggle tabs */}
-                  <div className="flex bg-zinc-900/50 p-1 rounded-lg border border-white/5">
-                    <button
-                      onClick={() => setViewFilter('selected')}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'selected' ? 'bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
-                    >
-                      Selected Only
-                    </button>
-                    <button
-                      onClick={() => setViewFilter('all')}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${viewFilter === 'all' ? 'bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 text-white shadow' : 'text-zinc-400 hover:text-zinc-200'}`}
-                    >
-                      All Images
-                    </button>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => handleExportFilenames('lightroom')}
-                    className="flex items-center gap-1.5 text-xs bg-amber-500 text-black border-amber-400/50 shadow-amber-500/20 hover:bg-amber-400 text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                    <span>Copy for Lightroom / Capture One</span>
-                  </button>
-                  <button
-                    onClick={() => handleExportFilenames('explorer')}
-                    className="flex items-center gap-1.5 text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer border border-white/5"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                    <span>Copy for Windows Search (OR)</span>
-                  </button>
-                  <button
-                    onClick={handleExportToFolder}
-                    disabled={exportingFolder}
-                    className="flex items-center gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    <FolderOpen className="h-3.5 w-3.5" />
-                    <span>{exportingFolder ? 'Copying files...' : 'Copy to "Selected_Photos" Folder'}</span>
-                  </button>
-
-                  {/* Status Finalize Toggles */}
-                  {selectedAlbumDetails.status === 'COMPLETED' ? (
-                    <button
-                      onClick={() => handleToggleAlbumStatus('PENDING')}
-                      className="flex items-center gap-1.5 text-xs bg-yellow-600 hover:bg-yellow-500 text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer"
-                    >
-                      <RefreshCw className="h-3.5 w-3.5" />
-                      <span>Re-Open Selection (Unlock)</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleToggleAlbumStatus('COMPLETED')}
-                      className="flex items-center gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2.5 rounded-lg font-semibold transition-colors cursor-pointer"
-                    >
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      <span>Finalize & Lock Selection</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Photo list */}
-              {selectedAlbumDetails.images?.length === 0 ? (
-                <div className="text-center py-10 text-zinc-500">
-                  No images synced in this album yet.
-                </div>
-              ) : selectedAlbumDetails.images?.filter((img: any) => viewFilter === 'all' || img.selections?.some((s: any) => s.isSelected)).length === 0 ? (
-                <div className="text-center py-10 text-zinc-500">
-                  No selected images found.
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {selectedAlbumDetails.images
-                    ?.filter((img: any) => {
-                      if (viewFilter === 'selected') {
-                        return img.selections?.some((s: any) => s.isSelected);
-                      }
-                      return true;
-                    })
-                    ?.map((img: any) => {
-                    const isFav = img.selections?.some((s: any) => s.isFavorite);
-                    const isSel = img.selections?.some((s: any) => s.isSelected);
-                    const commentsCount = img.comments?.length || 0;
-
-                    // Compute stream URL
-                    const localPreview = `http://localhost:8082/stream/file/${selectedAlbumDetails.id}/${img.filename}?size=thumbnail`;
-
-                    return (
-                      <div key={img.id} className="relative rounded-xl border border-white/5 bg-[#0d0d11] overflow-hidden p-2 flex flex-col justify-between space-y-2 group">
-                        <div className="aspect-square w-full rounded-lg overflow-hidden bg-zinc-950 relative">
-                          <img 
-                            src={localPreview} 
-                            alt={img.filename} 
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1519741497674-611481863552?w=150&auto=format&fit=crop&q=60`;
-                            }}
-                          />
-                          {/* Badges */}
-                          <div className="absolute top-2 right-2 flex items-center gap-1">
-                            {isFav && (
-                              <div className="p-1 rounded bg-rose-500/90 text-white">
-                                <Heart className="h-3 w-3" fill="currentColor" />
-                              </div>
-                            )}
-                            {isSel && (
-                              <div className="p-1 rounded bg-emerald-500/90 text-white text-[10px] font-bold flex items-center justify-center">
-                                <Check className="h-3 w-3" />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="px-1">
-                          <div className="text-[10px] font-mono text-zinc-400 truncate" title={img.filename}>
-                            {img.filename}
-                          </div>
-                          {commentsCount > 0 && (
-                            <div className="text-[10px] text-zinc-500 mt-0.5 flex items-center gap-1">
-                              <span>💬 {commentsCount} comment{commentsCount > 1 ? 's' : ''}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <div className="border-t border-white/5 pt-4 flex justify-end">
-              <button
-                onClick={() => setSelectedAlbumDetails(null)}
-                className="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Floating Syncing Progress Toast */}
-      {albums
-        .filter((album) => album.totalImages > 0 && (album._count?.images || 0) < album.totalImages)
-        .map((album) => {
-          const synced = album._count?.images || 0;
-          const total = album.totalImages;
-          const pct = Math.round((synced / total) * 100);
-
-          return (
-            <div key={album.id} className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#15151a]/95 border border-amber-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                  <RefreshCw className="h-5 w-5 animate-spin" style={{ animationDuration: '3s' }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-bold text-white truncate">Syncing "{album.name}"</h4>
-                  <p className="text-xs text-zinc-400 mt-0.5">Uploading previews from your folder...</p>
-                  
-                  <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-2 font-mono">
-                    <span>{synced} / {total} photos</span>
-                    <span className="text-amber-500 font-bold">{pct}%</span>
-                  </div>
-                  
-                  <div className="w-full bg-white/5 border border-white/5 rounded-full h-1 mt-1.5 overflow-hidden">
-                    <div 
-                      className="bg-amber-500 h-1 rounded-full transition-all duration-500"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-      {/* Floating Completed Sync Success Toast */}
-      {completedToast && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-full bg-[#15151a]/95 border border-emerald-500/30 p-4 rounded-2xl shadow-2xl animate-fade-in">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-              <Check className="h-5 w-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold text-white truncate">Sync Complete!</h4>
-              <p className="text-xs text-zinc-400 mt-0.5">"{completedToast.name}" is fully updated.</p>
-              <p className="text-[10px] text-emerald-400 font-bold mt-1">✓ {completedToast.total} photos uploaded successfully</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

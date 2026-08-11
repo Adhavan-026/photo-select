@@ -289,13 +289,13 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
   if (passcodeRequired) {
     return (
       <div className="min-h-screen bg-[#08080a] flex items-center justify-center px-6">
-        <div className="glass-panel w-full max-w-sm p-8 rounded-2xl text-center space-y-6">
+        <div className="paper-card bg-[#FFFDF9] border border-[#3A2B23]/10 w-full max-w-sm p-8 rounded-2xl text-center space-y-6">
           <div className="h-12 w-12 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto">
             <Lock className="h-6 w-6" />
           </div>
           <div>
             <h3 className="text-xl font-bold text-white">Private Gallery</h3>
-            <p className="text-xs text-zinc-400 mt-1">Please enter the 4-digit passcode to unlock the wedding photos.</p>
+            <p className="text-xs text-[#6B5B4E] mt-1">Please enter the 4-digit passcode to unlock the wedding photos.</p>
           </div>
 
           <form onSubmit={handlePasscodeSubmit} className="space-y-4">
@@ -334,7 +334,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#08080a] flex items-center justify-center text-zinc-500">
+      <div className="min-h-screen bg-[#08080a] flex items-center justify-center text-[#6B5B4E]">
         Assembling gallery assets...
       </div>
     );
@@ -342,14 +342,14 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
 
   if (error || !album) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-red-400 px-6 text-center font-sans">
+      <div className="min-h-screen bg-[#F6EDE2] text-[#3A2B23] flex items-center justify-center text-red-400 px-6 text-center font-sans">
         {error || 'Album not found.'}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-zinc-200 font-sans flex flex-col relative pb-32">
+    <div className="min-h-screen bg-[#F6EDE2] text-[#3A2B23] text-zinc-200 font-sans flex flex-col relative pb-32">
       {/* Cinematic Hero Header */}
       <header className="relative w-full py-24 flex flex-col items-center justify-center text-center overflow-hidden border-b border-white/5 bg-[#0d0d11]">
         {/* Subtle blurred background element */}
@@ -360,12 +360,12 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
           <img src="/studioz-full-logo.png" alt="Studioz Logo" className="h-[40px] w-auto object-contain mb-10 opacity-70" />
           <h1 className="text-4xl md:text-5xl font-serif text-white tracking-wide mb-4">{album.name}</h1>
           <div className="w-12 h-[1px] bg-amber-500/50 mb-4"></div>
-          <p className="text-sm md:text-base text-zinc-400 font-light tracking-widest uppercase">{album.description}</p>
+          <p className="text-sm md:text-base text-[#6B5B4E] font-light tracking-widest uppercase">{album.description}</p>
         </div>
       </header>
 
       {album.status === 'COMPLETED' && (
-        <div className="bg-emerald-500/5 border-b border-emerald-500/10 px-8 py-3 text-center text-xs text-emerald-400 font-medium flex items-center justify-center gap-2 animate-fade-in">
+        <div className="bg-[#8A9678]/5 border-b border-emerald-500/10 px-8 py-3 text-center text-xs text-[#8A9678] font-medium flex items-center justify-center gap-2 animate-fade-in">
           <span>🔒 Finalized: This gallery selection is locked. Choices have been sent to the photographer.</span>
         </div>
       )}
@@ -373,8 +373,8 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
       {/* Grid Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
         {!isAgentOnline && (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6 flex items-center gap-3 animate-fade-in">
-            <Camera className="h-5 w-5 text-amber-400 animate-pulse shrink-0" />
+          <div className="bg-amber-500/10 border border-[#C17B72]/20 rounded-xl p-4 mb-6 flex items-center gap-3 animate-fade-in">
+            <Camera className="h-5 w-5 text-[#C17B72] animate-pulse shrink-0" />
             <div className="text-xs text-amber-200">
               <span className="font-bold">Photographer is offline.</span> The studio agent is currently disconnected. Photos and selection controls will load once the photographer starts the app online.
             </div>
@@ -382,7 +382,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
         )}
 
         {images.length === 0 ? (
-          <div className="text-center py-20 text-zinc-500">
+          <div className="text-center py-20 text-[#6B5B4E]">
             This album has no photos yet.
           </div>
         ) : (
@@ -399,7 +399,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
               return (
                 <div 
                   key={img.id} 
-                  className="break-inside-avoid relative rounded-sm overflow-hidden group bg-[#0a0a0a] shadow-md hover:shadow-xl transition-all duration-500"
+                  className="break-inside-avoid relative rounded-sm overflow-hidden group bg-[#F6EDE2] text-[#3A2B23] shadow-md hover:shadow-xl transition-all duration-500"
                 >
                   <img
                     src={imgSrc}
@@ -421,7 +421,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                   <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-[-10px] group-hover:translate-y-0">
                     <button
                       onClick={() => handleSelectToggle(img, 'isFavorite')}
-                      className={`p-2.5 rounded-full backdrop-blur-xl border border-white/10 transition-colors ${isFav ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20' : 'bg-black/40 text-white/70 hover:text-white hover:bg-black/60'}`}
+                      className={`p-2.5 rounded-full backdrop-blur-xl border border-white/10 transition-colors ${isFav ? 'bg-[#C17B72] text-[#FFFDF9] hover:bg-[#b06a61] shadow-lg shadow-amber-500/20' : 'bg-black/40 text-white/70 hover:text-white hover:bg-black/60'}`}
                     >
                       <Heart className="h-4 w-4" fill={isFav ? 'currentColor' : 'none'} />
                     </button>
@@ -447,7 +447,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
           <div className="flex-1 relative flex items-center justify-center p-6 border-r border-white/5">
             <button 
               onClick={() => setActiveImageIndex(null)}
-              className="absolute top-6 left-6 p-2 rounded-lg bg-white/5 border border-white/10 text-zinc-400 hover:text-white transition-colors"
+              className="absolute top-6 left-6 p-2 rounded-lg bg-white/5 border border-white/10 text-[#6B5B4E] hover:text-white transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -460,7 +460,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                 setImageLoading(true);
                 loadComments(images[activeImageIndex - 1].id);
               }}
-              className="absolute left-6 p-3 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors z-20"
+              className="absolute left-6 p-3 rounded-full bg-white/5 border border-white/10 text-[#6B5B4E] hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors z-20"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -489,7 +489,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                 setImageLoading(true);
                 loadComments(images[activeImageIndex + 1].id);
               }}
-              className="absolute right-6 p-3 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors z-20"
+              className="absolute right-6 p-3 rounded-full bg-white/5 border border-white/10 text-[#6B5B4E] hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-colors z-20"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
@@ -500,21 +500,21 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
             <div className="space-y-6">
               <div>
                 <h4 className="text-sm font-bold text-white">{activeImage.filename}</h4>
-                <p className="text-xs text-zinc-500 mt-1">EXIF: {activeImage.exifData?.camera || 'Unavailable'}</p>
+                <p className="text-xs text-[#6B5B4E] mt-1">EXIF: {activeImage.exifData?.camera || 'Unavailable'}</p>
               </div>
 
               {/* Selector box */}
               <div className="flex gap-4">
                 <button
                   onClick={() => handleSelectToggle(activeImage, 'isFavorite')}
-                  className={`flex-1 py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 transition-all text-sm font-semibold shadow-sm ${activeImage.selections?.find(s => s.clientId === clientId)?.isFavorite ? 'bg-amber-500 text-black border-amber-500/50 shadow-amber-500/20' : 'bg-[#15151a] text-zinc-400 hover:text-white hover:bg-[#1a1a24]'}`}
+                  className={`flex-1 py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 transition-all text-sm font-semibold shadow-sm ${activeImage.selections?.find(s => s.clientId === clientId)?.isFavorite ? 'bg-[#C17B72] text-[#FFFDF9] hover:bg-[#b06a61] border-[#C17B72]/50 shadow-amber-500/20' : 'bg-[#FFFDF9] text-[#6B5B4E] hover:text-white hover:bg-[#1a1a24]'}`}
                 >
                   <Heart className="h-4.5 w-4.5" fill={activeImage.selections?.find(s => s.clientId === clientId)?.isFavorite ? 'currentColor' : 'none'} />
                   <span>Favorite</span>
                 </button>
                 <button
                   onClick={() => handleSelectToggle(activeImage, 'isSelected')}
-                  className={`flex-1 py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 transition-all text-sm font-semibold shadow-sm ${activeImage.selections?.find(s => s.clientId === clientId)?.isSelected ? 'bg-white text-black border-white/50' : 'bg-[#15151a] text-zinc-400 hover:text-white hover:bg-[#1a1a24]'}`}
+                  className={`flex-1 py-3.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 transition-all text-sm font-semibold shadow-sm ${activeImage.selections?.find(s => s.clientId === clientId)?.isSelected ? 'bg-white text-black border-white/50' : 'bg-[#FFFDF9] text-[#6B5B4E] hover:text-white hover:bg-[#1a1a24]'}`}
                 >
                   <CheckCircle className="h-4.5 w-4.5" />
                   <span>Select</span>
@@ -523,7 +523,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
 
               {/* Comments Board */}
               <div className="border-t border-white/5 pt-6">
-                <h5 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <h5 className="text-xs font-semibold text-[#6B5B4E] uppercase tracking-wider mb-4 flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
                   <span>Comments ({activeComments.length})</span>
                 </h5>
@@ -534,11 +534,11 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                   ) : (
                     activeComments.map((com) => (
                       <div key={com.id} className="text-xs bg-white/5 p-3 rounded-lg border border-white/5">
-                        <div className="flex items-center justify-between text-zinc-500 font-mono mb-1">
+                        <div className="flex items-center justify-between text-[#6B5B4E] font-mono mb-1">
                           <span>{com.authorId === clientId ? 'You' : 'Client'}</span>
                           <span>{new Date(com.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                         </div>
-                        <p className="text-zinc-300">{com.content}</p>
+                        <p className="text-[#3A2B23]">{com.content}</p>
                       </div>
                     ))
                   )}
@@ -553,7 +553,7 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
                 placeholder="Type a comment..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-[#15151a] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500/50 transition-colors text-xs"
+                className="w-full px-4 py-3 rounded-xl bg-[#FFFDF9] border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-[#C17B72]/50 transition-colors text-xs"
               />
               <button
                 type="submit"
@@ -571,19 +571,19 @@ export default function GalleryPage({ params }: { params: Promise<{ slug: string
       {/* Floating Action Bar (Bottom Center) */}
       {images.length > 0 && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[500px]">
-          <div className="bg-[#15151a]/90 backdrop-blur-2xl border border-white/10 rounded-full px-6 py-4 flex items-center justify-between shadow-2xl shadow-black/50 gap-6">
+          <div className="bg-[#FFFDF9]/90 backdrop-blur-2xl border border-white/10 rounded-full px-6 py-4 flex items-center justify-between shadow-2xl shadow-black/50 gap-6">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
                 <span className="text-white font-bold text-sm">
                   {images.filter(img => img.selections?.some(s => s.clientId === clientId && s.isSelected)).length}
                 </span>
               </div>
-              <span className="text-zinc-400 font-medium text-sm hidden sm:block">
+              <span className="text-[#6B5B4E] font-medium text-sm hidden sm:block">
                 Photos Selected
               </span>
             </div>
             {album.status === 'COMPLETED' ? (
-              <div className="px-6 py-3 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-zinc-400 flex items-center gap-2 cursor-default">
+              <div className="px-6 py-3 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-[#6B5B4E] flex items-center gap-2 cursor-default">
                 <Lock className="h-4 w-4" />
                 <span>Selection Locked</span>
               </div>
