@@ -221,11 +221,11 @@ export default function StudioDashboard() {
       
       {/* 1. Full-Width Sticky --paper Nav Bar with Sprockets Detail */}
       <header className="sticky top-0 z-40 w-full bg-[#F6EDE2] border-b border-[#3A2B23]/10">
-        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <a href="/" className="flex items-center gap-2">
-              <span className="font-serif italic text-2xl font-medium tracking-tight text-[#3A2B23]">
-                Studioz <span className="inline-block w-2 h-2 rounded-full bg-[#C17B72]"></span>
+              <span className="font-serif italic text-6xl font-medium tracking-tight text-[#3A2B23] flex items-center gap-3">
+                Studioz <span className="inline-block w-4 h-4 rounded-full bg-[#C17B72]"></span>
               </span>
             </a>
           </div>
@@ -254,9 +254,9 @@ export default function StudioDashboard() {
         </div>
 
         {/* Signature Motif: Film Sprocket Holes along bottom edge */}
-        <div className="w-full h-2 bg-[#3A2B23] flex justify-around items-center px-4 overflow-hidden">
+        <div className="w-full h-1 bg-[#3A2B23] flex justify-around items-center px-4 overflow-hidden">
           {Array.from({ length: 40 }).map((_, i) => (
-            <div key={i} className="w-2.5 h-1 bg-[#F6EDE2] rounded-[1px] opacity-70" />
+            <div key={i} className="w-2 h-[2px] bg-[#F6EDE2] rounded-[1px] opacity-70" />
           ))}
         </div>
       </header>
